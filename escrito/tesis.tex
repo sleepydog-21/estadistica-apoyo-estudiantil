@@ -309,19 +309,38 @@ Para dar solución al problema de los riesgos competitivos (abandono vs. rezago 
 
 Esta arquitectura de datos permite aislar los predictores del rezago académico (Enfoque Truncado) de los predictores del abandono escolar (Enfoque Multiclase), garantizando conclusiones estadísticamente robustas para cada fenómeno.
 
-\subsection{Transformación a Tiempo Activo: Compactación de Trayectorias}
+\subsection{Reincorporación de Bajas Temporales: Análisis de la Generación 2016}
 
-Durante el análisis exploratorio se identificó que el tratamiento estándar de las bajas temporales como periodos penalizados introduce un sesgo artificial en el semestre de término. Una proporción significativa de estudiantes que tramitan bajas temporales retoman y concluyen sus estudios posteriormente. Penalizar a estos alumnos sumando sus semestres de inactividad al cálculo de su rezago distorsiona su perfil académico real.
+A pesar de que el filtro inicial remueve el "ruido" de los abandonos, una revisión profunda del volumen de datos excluidos (Figura \ref{fig:poblacion_matematicas}) reveló un costo muestral inaceptable. Al analizar específicamente a la \textbf{Generación 2016} —elegida por ser la cohorte más moderna con tiempo suficiente para madurar sus procesos de titulación— se descubrió empíricamente que una fracción significativa de los alumnos con Baja Temporal (\textit{BT}) no abandona la carrera, sino que reingresa y concluye exitosamente sus estudios. 
 
-Para resolver este desafío analítico, se implementó un algoritmo de compactación temporal que transforma el eje de \textit{Semestres Cronológicos} a \textit{Semestres Activos}. El procedimiento metodológico consiste en:
+Excluir de manera definitiva a la población con Baja Temporal significa descartar casos de éxito reales que experimentaron rezago justificado, lo cual atenta contra la representatividad estadística del modelo predictivo. Por tanto, surge el imperativo metodológico de reincorporar a estos estudiantes corrigiendo la distorsión que su periodo de ausencia genera sobre la variable \texttt{semestre\_termino}.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{correccion_bt_2016_matematicas}
+    \caption{Distribución del semestre de término para alumnos de la Generación 2016 con Baja Temporal, contrastando el cálculo cronológico vs. corrección dinámica.}
+    \label{fig:correccion_2016_matematicas}
+\end{figure}
+
+\subsection{Estrategias de Corrección: Fija vs. Dinámica}
+
+Para evitar penalizar el rezago académico con periodos de ausencia administrativa, se evaluaron dos metodologías de ajuste temporal:
+
+\subsubsection{Corrección Fija (Promedio de Ausencia)}
+La primera aproximación consistió en calcular el promedio histórico de semestres inactivos para los estudiantes con \textit{BT} que logran titularse. Este enfoque resta una constante $C$ (el promedio de ausencia) al semestre de término cronológico de toda la subpoblación con Baja Temporal. Si bien es computacionalmente económica, esta técnica impone una homogeneidad irreal sobre un fenómeno altamente disperso.
+
+\subsubsection{Corrección Dinámica (Transformación a Tiempo Activo)}
+Para resolver la sobredispersión de la corrección fija, se implementó un algoritmo de compactación temporal individualizada que transforma el eje de \textit{Semestres Cronológicos} a \textit{Semestres Activos}. El procedimiento metodológico consiste en:
 \begin{enumerate}
-    \item \textbf{Detección de inactividad:} Se evaluó la variable \textit{Índice de Esfuerzo} de cada estudiante. Todo semestre con valor nulo se clasificó como inactivo.
-    \item \textbf{Depuración de abandono prolongado:} Se excluyó de este análisis a cualquier estudiante con registro de Baja Definitiva o con un acumulado mayor a 4 semestres inactivos, asumiendo deserción permanente.
-    \item \textbf{Compactación (Shift izquierdo):} Para cada alumno retenido, se eliminaron las columnas correspondientes a sus periodos inactivos y se recorrió su trayectoria hacia la izquierda. De este modo, si un estudiante cursó los semestres cronológicos 1, 2, y 3, pausó en el 4, y retomó en el 5, su quinto semestre cronológico fue reasignado matemáticamente como su \textit{cuarto semestre activo}.
-    \item \textbf{Recálculo del Semestre de Término:} Sobre esta nueva trayectoria compacta de 8 semestres activos, se identificó el índice real en el que el estudiante alcanza las condiciones de egreso.
+    \item \textbf{Detección de inactividad individual:} Se evaluó la variable \textit{Índice de Esfuerzo} de cada estudiante. Todo semestre con valor nulo se clasificó como inactivo.
+    \item \textbf{Depuración de abandono prolongado:} Se excluyó permanentemente a cualquier estudiante con registro de Baja Definitiva o con un acumulado mayor a 4 semestres inactivos.
+    \item \textbf{Compactación (Shift izquierdo):} Para cada alumno retenido, se eliminaron las columnas correspondientes a sus periodos inactivos y se recorrió su trayectoria hacia la izquierda, compactando sus verdaderos semestres de exposición académica.
+    \item \textbf{Recálculo Dinámico:} Sobre esta nueva trayectoria compacta, se identificó el índice real activo en el que el estudiante alcanza las condiciones de egreso.
 \end{enumerate}
 
-Esta transformación metodológica garantiza que las variables predictoras (los primeros 8 semestres) reflejen puramente el desempeño del alumno mientras estuvo expuesto a la carga académica, eliminando el "ruido" estadístico de las pausas justificadas administrativamente.
+\subsubsection{Análisis de Error}
+Al comparar el desempeño de ambas estrategias, la Corrección Fija demostró ser insuficiente. Para la licenciatura en Matemáticas, aunque el promedio de semestres inactivos es relativamente bajo ($C=0.43$), el Error Absoluto Medio (MAE) de la Corrección Fija respecto a la trayectoria activa real fue de $0.62$ semestres, con desviaciones atípicas que alcanzaron un Error Máximo de $5.57$ semestres. En Física, la penalización máxima llegó a ser de $5.61$ semestres de error.
+
+Estos resultados demuestran categóricamente que asumir un comportamiento de ausencia uniforme introduce un ruido estadístico severo en los extremos de la distribución. En consecuencia, se determinó utilizar la \textbf{Corrección Dinámica (Tiempo Activo)} como la transformación estándar para todo el proyecto, garantizando que los primeros 8 semestres de predicción reflejen puramente el desempeño del alumno mientras estuvo académicamente expuesto.
 
 \end{document}
