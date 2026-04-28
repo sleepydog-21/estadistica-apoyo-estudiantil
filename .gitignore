@@ -1,7 +1,12 @@
 # Ignorar datos pero mantener estructura
 Datos/Datos_crudos/*
 !Datos/Datos_crudos/.gitkeep
-Datos/Datos_limpios/*
+Datos/Datos_limpios_base/*
+!Datos/Datos_limpios_base/.gitkeep
+Datos/Datos_limpios_truncados/*
+!Datos/Datos_limpios_truncados/.gitkeep
+Datos/Datos_limpios_multiclase/*
+!Datos/Datos_limpios_multiclase/.gitkeep
 !Datos/Datos_limpios/.gitkeep
 
 # Python

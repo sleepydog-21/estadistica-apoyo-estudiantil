@@ -277,4 +277,23 @@ Este problema es particularmente agudo al considerar el efecto generacional. Las
 
 Visualizar la distribución del semestre de término condicionada por la generación permite constatar empíricamente este sesgo: el promedio de la variable experimenta un repunte drástico en las cohortes recientes impulsado casi exclusivamente por la acumulación de datos censurados, lo que invalida el tratamiento de esta variable como puramente continua y advierte la necesidad de emplear técnicas de análisis multivariado o de supervivencia para mitigar este artefacto estadístico.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{boxplot_censura_gen_matematicas}
+    \caption{Distribución del semestre de término por generación (Matemáticas), mostrando la acumulación artificial en $s=20$ para cohortes recientes.}
+    \label{fig:boxplot_censura_matematicas}
+\end{figure}
+
+\subsection{Estrategias Analíticas Paralelas}
+
+Para dar solución al problema de los riesgos competitivos (abandono vs. rezago continuo) y la censura por la derecha, la metodología de este estudio propone la construcción y análisis de tres conjuntos de datos paralelos:
+
+\begin{enumerate}
+    \item \textbf{Enfoque Base (Censurado):} Conserva la asignación de $k=20$ para los estudiantes que no han concluido. Se utiliza como línea base para dimensionar el impacto del sesgo metodológico.
+    \item \textbf{Enfoque Truncado (A ciegas):} Restringe la muestra únicamente a las cohortes de ingreso anteriores a 2017 (Generación $\leq 2016$). En este conjunto, los estudiantes inconclusos se eliminan del análisis lineal (tratados como \textit{Missing Not At Random}), bajo el supuesto empírico de que la inmensa mayoría de los casos sin titular después de 16 semestres corresponden a abandono definitivo. Este enfoque permite correlacionar el rezago puramente en la población que sí logró culminar sus estudios.
+    \item \textbf{Enfoque Multiclase (Informado):} Sustituye la predicción continua del semestre de término por la clasificación del estado final del estudiante. Se construyó una variable categórica evaluando tanto el tiempo de titulación como la caída del \textit{Índice de Esfuerzo} en los últimos semestres registrados, definiendo cuatro posibles estados: Titulado a tiempo ($k \leq 10$), Titulado con rezago ($10 < k < 20$), Abandono silencioso y Activo (aún cursando).
+\end{enumerate}
+
+Esta arquitectura de datos permite aislar los predictores del rezago académico (Enfoque Truncado) de los predictores del abandono escolar (Enfoque Multiclase), garantizando conclusiones estadísticamente robustas para cada fenómeno.
+
 \end{document}
