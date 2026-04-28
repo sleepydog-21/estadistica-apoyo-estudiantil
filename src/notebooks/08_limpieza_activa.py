@@ -72,17 +72,25 @@ for carrera in carreras:
     for cuenta in cuentas_comunes:
         esf_vals = df_esf.loc[cuenta, valid_cols].values.astype(float)
         
-        # Consideramos inactivo si el esfuerzo es NaN
-        mask_active = ~np.isnan(esf_vals)
-        num_inactivos = (~mask_active).sum()
+        # Ignorar trailing NaNs para no penalizar a los que aún no llegan al s20 o abandonaron definitivamente
+        valid_idx = np.where(~np.isnan(esf_vals))[0]
+        if len(valid_idx) == 0:
+            continue
+            
+        last_valid = valid_idx[-1]
+        esf_real = esf_vals[:last_valid+1]
         
-        # Criterio: Rechazar si tiene > 4 semestres inactivos
-        if num_inactivos > 4 or mask_active.sum() == 0:
+        # Consideramos inactivo a los huecos (NaN) dentro del rango real
+        num_inactivos = np.isnan(esf_real).sum()
+        
+        # Criterio: Rechazar si tiene > 4 semestres inactivos intermedios
+        if num_inactivos > 4:
             continue
             
         cuentas_validas.append(cuenta)
         
-        # Compactar cada dimensión
+        # Compactar cada dimensión (usando mask_active sobre los 20 valores para hacer el shift correctamente)
+        mask_active = ~np.isnan(esf_vals)
         esf_shifted = esf_vals[mask_active]
         reg_shifted = df_reg.loc[cuenta, valid_cols].values.astype(float)[mask_active]
         nat_shifted = df_nat.loc[cuenta, valid_cols].values.astype(float)[mask_active]
