@@ -32,16 +32,22 @@ for carrera in carreras:
     
     # Predictores: Excluir metadata y el target
     metadata_cols = ['Cuenta', 'Generación', target_col]
-    X_raw = df.drop(columns=metadata_cols, errors='ignore')
     
-    # 1. Imputación (PCA no acepta NaNs)
-    # Usamos la media para no sesgar drásticamente la distribución
-    imputer = SimpleImputer(strategy='mean')
-    X_imputed = imputer.fit_transform(X_raw)
+    # 1. Filtrar alumnos con datos completos en los 8 semestres
+    # Solo tomamos promedios, esfuerzo y regularidad de s1 a s8
+    # Si falta un dato en este bloque, el alumno no tiene la trayectoria de 8 semestres completa
+    df_pca = df.dropna(subset=[col for col in df.columns if any(s in col for s in [f's{i}' for i in range(1, 9)])])
+    
+    if df_pca.empty:
+        print(f"No hay alumnos con 8 semestres completos para: {carrera}")
+        continue
+
+    X_raw = df_pca.drop(columns=metadata_cols, errors='ignore')
+    y = df_pca[target_col].fillna(20).values
     
     # 2. Estandarización
     scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X_imputed)
+    X_scaled = scaler.fit_transform(X_raw)
     
     # 3. Aplicar PCA
     pca = PCA(n_components=10) 
