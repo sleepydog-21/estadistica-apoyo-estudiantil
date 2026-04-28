@@ -309,4 +309,19 @@ Para dar solución al problema de los riesgos competitivos (abandono vs. rezago 
 
 Esta arquitectura de datos permite aislar los predictores del rezago académico (Enfoque Truncado) de los predictores del abandono escolar (Enfoque Multiclase), garantizando conclusiones estadísticamente robustas para cada fenómeno.
 
+\subsection{Transformación a Tiempo Activo: Compactación de Trayectorias}
+
+Durante el análisis exploratorio se identificó que el tratamiento estándar de las bajas temporales como periodos penalizados introduce un sesgo artificial en el semestre de término. Una proporción significativa de estudiantes que tramitan bajas temporales retoman y concluyen sus estudios posteriormente. Penalizar a estos alumnos sumando sus semestres de inactividad al cálculo de su rezago distorsiona su perfil académico real.
+
+Para resolver este desafío analítico, se implementó un algoritmo de compactación temporal que transforma el eje de \textit{Semestres Cronológicos} a \textit{Semestres Activos}. El procedimiento metodológico consiste en:
+
+\begin{enumerate}
+    \item \textbf{Detección de inactividad:} Se evaluó la variable \textit{Índice de Esfuerzo} de cada estudiante. Todo semestre con valor nulo se clasificó como inactivo.
+    \item \textbf{Depuración de abandono prolongado:} Se excluyó de este análisis a cualquier estudiante con registro de Baja Definitiva o con un acumulado mayor a 4 semestres inactivos, asumiendo deserción permanente.
+    \item \textbf{Compactación (Shift izquierdo):} Para cada alumno retenido, se eliminaron las columnas correspondientes a sus periodos inactivos y se recorrió su trayectoria hacia la izquierda. De este modo, si un estudiante cursó los semestres cronológicos 1, 2, y 3, pausó en el 4, y retomó en el 5, su quinto semestre cronológico fue reasignado matemáticamente como su \textit{cuarto semestre activo}.
+    \item \textbf{Recálculo del Semestre de Término:} Sobre esta nueva trayectoria compacta de 8 semestres activos, se identificó el índice real en el que el estudiante alcanza las condiciones de egreso.
+\end{enumerate}
+
+Esta transformación metodológica garantiza que las variables predictoras (los primeros 8 semestres) reflejen puramente el desempeño del alumno mientras estuvo expuesto a la carga académica, eliminando el "ruido" estadístico de las pausas justificadas administrativamente.
+
 \end{document}
