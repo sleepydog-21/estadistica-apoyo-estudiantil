@@ -267,4 +267,14 @@ particular, un mayor riesgo de encontrarse en condición de Artículo 32.
 Esta variable permite vincular de manera directa los indicadores semestrales del Vector
 Excalibur con el análisis de tendencias académicas mediante modelos estadísticos explicables.
 
+\subsection{El problema de la censura por la derecha y el sesgo generacional}
+
+La asignación artificial del valor 20 a los estudiantes que no han concluido su licenciatura (o que han desertado sin ser dados de baja oficialmente) introduce un desafío metodológico conocido en el análisis de supervivencia como \textit{censura por la derecha}.
+
+Tratar un dato censurado como un valor numérico fijo ($k=20$) genera un sesgo significativo, pues aglomera de manera artificial una gran proporción de observaciones en la cota superior del tiempo reglamentario, creando una distribución fuertemente sesgada y bimodal. Esta concentración diluye la varianza de la muestra y atenúa las correlaciones paramétricas y no paramétricas.
+
+Este problema es particularmente agudo al considerar el efecto generacional. Las cohortes de ingreso antiguas han tenido tiempo suficiente para alcanzar el semestre 20 (o titularse tardíamente), por lo que la proporción de datos censurados en dichas generaciones corresponde principalmente a casos de rezago extremo o abandono definitivo. En contraste, para las generaciones de ingreso recientes, una proporción considerable de la cohorte será clasificada con \texttt{semestre\_termino} $= 20$ simplemente porque, al momento de la observación, aún no ha transcurrido el tiempo necesario para que concluyan sus estudios de manera regular. 
+
+Visualizar la distribución del semestre de término condicionada por la generación permite constatar empíricamente este sesgo: el promedio de la variable experimenta un repunte drástico en las cohortes recientes impulsado casi exclusivamente por la acumulación de datos censurados, lo que invalida el tratamiento de esta variable como puramente continua y advierte la necesidad de emplear técnicas de análisis multivariado o de supervivencia para mitigar este artefacto estadístico.
+
 \end{document}
