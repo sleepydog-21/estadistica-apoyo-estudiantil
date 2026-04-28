@@ -313,9 +313,18 @@ Esta arquitectura de datos permite aislar los predictores del rezago académico 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{imagenes/poblacion_comparativa_matematicas}
-    \caption{Comparativa de población estudiantil total vs. activa por generación (Matemáticas), ilustrando la atrición por bajas definitivas y temporales.}
-    \label{fig:poblacion_matematicas}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imagenes/poblacion_comparativa_matematicas}
+        \caption{Población total vs. activa (Matemáticas).}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imagenes/poblacion_comparativa_fisica}
+        \caption{Población total vs. activa (Física).}
+    \end{minipage}
+    \label{fig:poblacion_comparativa}
 \end{figure}
 
 A pesar de que el filtro inicial remueve el "ruido" de los abandonos, una revisión profunda del volumen de datos excluidos (Figura \ref{fig:poblacion_matematicas}) reveló un costo muestral inaceptable. Al analizar específicamente a la \textbf{Generación 2016} —elegida por ser la cohorte más moderna con tiempo suficiente para madurar sus procesos de titulación— se descubrió empíricamente que una fracción significativa de los alumnos con Baja Temporal (\textit{BT}) no abandona la carrera, sino que reingresa y concluye exitosamente sus estudios. 
@@ -326,9 +335,18 @@ La implementación de esta reincorporación tuvo un impacto cuantitativo masivo 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{imagenes/correccion_bt_2016_matematicas}
-    \caption{Distribución del semestre de término para alumnos de la Generación 2016 con Baja Temporal, contrastando el cálculo cronológico vs. corrección dinámica.}
-    \label{fig:correccion_2016_matematicas}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imagenes/correccion_bt_2016_matematicas}
+        \caption{Corrección dinámica Gen 2016 (Matemáticas).}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imagenes/correccion_bt_2016_fisica}
+        \caption{Corrección dinámica Gen 2016 (Física).}
+    \end{minipage}
+    \label{fig:correccion_2016}
 \end{figure}
 
 \subsection{Estrategias de Corrección: Fija vs. Dinámica}
@@ -371,8 +389,17 @@ El análisis mediante diagramas de caja (Figura \ref{fig:eda_boxplot}) permite o
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{imagenes/eda_boxplot_gen_matematicas}
-    \caption{Distribución del tiempo de egreso por generación en la licenciatura de Matemáticas.}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imagenes/eda_boxplot_gen_matematicas}
+        \caption{Distribución por generación (Matemáticas).}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imagenes/eda_boxplot_gen_fisica}
+        \caption{Distribución por generación (Física).}
+    \end{minipage}
     \label{fig:eda_boxplot}
 \end{figure}
 
@@ -404,8 +431,17 @@ Al analizar las cargas (loadings) del PC1, se observa que las variables con mayo
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{imagenes/pca_loadings_matematicas}
-    \caption{Mapa de calor de los loadings (pesos) de los primeros tres componentes principales (Matemáticas).}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imagenes/pca_loadings_matematicas}
+        \caption{Loadings PCA (Matemáticas).}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imagenes/pca_loadings_fisica}
+        \caption{Loadings PCA (Física).}
+    \end{minipage}
     \label{fig:pca_loadings}
 \end{figure}
 
@@ -431,8 +467,17 @@ La proyección de los estudiantes en el espacio definido por PC1 y PC2 (Figura \
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{imagenes/pca_scatter_matematicas}
-    \caption{Proyección PCA de trayectorias académicas (Matemáticas), coloreada por el semestre de término activo.}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imagenes/pca_scatter_matematicas}
+        \caption{Proyección latente (Matemáticas).}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imagenes/pca_scatter_fisica}
+        \caption{Proyección latente (Física).}
+    \end{minipage}
     \label{fig:pca_scatter}
 \end{figure}
 
