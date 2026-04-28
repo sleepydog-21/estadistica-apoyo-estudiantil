@@ -311,6 +311,13 @@ Esta arquitectura de datos permite aislar los predictores del rezago académico 
 
 \subsection{Reincorporación de Bajas Temporales: Análisis de la Generación 2016}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imagenes/poblacion_comparativa_matematicas}
+    \caption{Comparativa de población estudiantil total vs. activa por generación (Matemáticas), ilustrando la atrición por bajas definitivas y temporales.}
+    \label{fig:poblacion_matematicas}
+\end{figure}
+
 A pesar de que el filtro inicial remueve el "ruido" de los abandonos, una revisión profunda del volumen de datos excluidos (Figura \ref{fig:poblacion_matematicas}) reveló un costo muestral inaceptable. Al analizar específicamente a la \textbf{Generación 2016} —elegida por ser la cohorte más moderna con tiempo suficiente para madurar sus procesos de titulación— se descubrió empíricamente que una fracción significativa de los alumnos con Baja Temporal (\textit{BT}) no abandona la carrera, sino que reingresa y concluye exitosamente sus estudios. 
 
 Excluir de manera definitiva a la población con Baja Temporal significa descartar casos de éxito reales que experimentaron rezago justificado, lo cual atenta contra la representatividad estadística del modelo predictivo. Por tanto, surge el imperativo metodológico de reincorporar a estos estudiantes corrigiendo la distorsión que su periodo de ausencia genera sobre la variable \texttt{semestre\_termino}.
@@ -319,7 +326,7 @@ La implementación de esta reincorporación tuvo un impacto cuantitativo masivo 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{correccion_bt_2016_matematicas}
+    \includegraphics[width=0.8\textwidth]{imagenes/correccion_bt_2016_matematicas}
     \caption{Distribución del semestre de término para alumnos de la Generación 2016 con Baja Temporal, contrastando el cálculo cronológico vs. corrección dinámica.}
     \label{fig:correccion_2016_matematicas}
 \end{figure}
@@ -344,5 +351,89 @@ Para resolver la sobredispersión de la corrección fija, se implementó un algo
 Al comparar el desempeño de ambas estrategias, la Corrección Fija demostró ser insuficiente. Para la licenciatura en Matemáticas, aunque el promedio de semestres inactivos es relativamente bajo ($C=0.43$), el Error Absoluto Medio (MAE) de la Corrección Fija respecto a la trayectoria activa real fue de $0.62$ semestres, con desviaciones atípicas que alcanzaron un Error Máximo de $5.57$ semestres. En Física, la penalización máxima llegó a ser de $5.61$ semestres de error.
 
 Estos resultados demuestran categóricamente que asumir un comportamiento de ausencia uniforme introduce un ruido estadístico severo en los extremos de la distribución. En consecuencia, se determinó utilizar la \textbf{Corrección Dinámica (Tiempo Activo)} como la transformación estándar para todo el proyecto, garantizando que los primeros 8 semestres de predicción reflejen puramente el desempeño del alumno mientras estuvo académicamente expuesto.
+
+\section{Resultados del Análisis Exploratorio de Datos}
+
+Tras la aplicación de la metodología de Tiempo Activo, se procedió a un análisis exploratorio profundo de las trayectorias resultantes. El objetivo es identificar los patrones subyacentes que rigen el rezago académico en la Facultad de Ciencias.
+
+\subsection{Evolución del Rezago por Generación}
+
+Al graficar la media del semestre de término corregido por generación, se observa una tendencia ascendente en las cohortes más recientes. Este fenómeno, ilustrado en la Figura \ref{fig:eda_media}, refleja el efecto de la censura informativa: los alumnos que terminan en periodos cortos ya han egresado, mientras que la población que experimentará rezago prolongado aún permanece activa en la base de datos.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imagenes/eda_media_semestre_termino}
+    \caption{Evolución de la media del semestre de término activo por generación (Matemáticas vs. Física).}
+    \label{fig:eda_media}
+\end{figure}
+
+El análisis mediante diagramas de caja (Figura \ref{fig:eda_boxplot}) permite observar que, en las generaciones con trayectorias maduras (2009-2012), el rezago era un evento atípico. Sin embargo, conforme avanzamos hacia 2018, la mediana se desplaza hacia valores superiores a 12 semestres, evidenciando una mayor dispersión en los tiempos de egreso.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imagenes/eda_boxplot_gen_matematicas}
+    \caption{Distribución del tiempo de egreso por generación en la licenciatura de Matemáticas.}
+    \label{fig:eda_boxplot}
+\end{figure}
+
+\subsection{Análisis de Componentes Principales (PCA)}
+
+Dada la alta dimensionalidad de los predictores (32 variables capturando esfuerzo, promedio y regularidad a lo largo de 8 semestres), se implementó un Análisis de Componentes Principales (PCA) para reducir la complejidad del espacio de estados. El análisis se restringió exclusivamente a los alumnos con trayectorias iniciales completas (S1-S8).
+
+\subsubsection{Varianza Explicada y Estructura de Datos}
+
+Como se detalla en la Tabla \ref{tab:pca_varianza}, el primer componente principal (PC1) captura una proporción masiva de la varianza total (68.9\% en Matemáticas y 75.8\% en Física). Esto sugiere que la trayectoria académica está dominada por un "perfil de rendimiento general" altamente consistente.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Componente} & \textbf{PC1} & \textbf{PC2} & \textbf{PC3} & \textbf{PC4} & \textbf{PC5} \\ \hline
+Var. Individual (Mat) & 68.9\% & 8.0\% & 6.3\% & 3.1\% & 2.2\% \\ \hline
+Var. Acumulada (Mat) & 68.9\% & 76.9\% & 83.2\% & 86.3\% & 88.5\% \\ \hline
+Var. Individual (Fís) & 75.8\% & 6.2\% & 4.7\% & 2.4\% & 1.7\% \\ \hline
+Var. Acumulada (Fís) & 75.8\% & 82.0\% & 86.8\% & 89.2\% & 90.9\% \\ \hline
+\end{tabular}
+\caption{Porcentaje de varianza explicada por los primeros cinco componentes principales.}
+\label{tab:pca_varianza}
+\end{table}
+
+\subsubsection{Interpretación de los Loadings}
+
+Al analizar las cargas (loadings) del PC1, se observa que las variables con mayor peso son los \textbf{Promedios Reales} de los semestres intermedios (S4-S8), como se muestra en la Tabla \ref{tab:pca_loadings}. Esto indica que la "inercia académica" alcanzada a mitad de la carrera es el factor determinante en la configuración de la trayectoria estudiantil.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{imagenes/pca_loadings_matematicas}
+    \caption{Mapa de calor de los loadings (pesos) de los primeros tres componentes principales (Matemáticas).}
+    \label{fig:pca_loadings}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|c|l|l|c|}
+\hline
+\multicolumn{3}{|c|}{\textbf{Matemáticas}} & \multicolumn{3}{c|}{\textbf{Física}} \\ \hline
+\textbf{Rango} & \textbf{Variable} & \textbf{PC1} & \textbf{Rango} & \textbf{Variable} & \textbf{PC1} \\ \hline
+1 & s5\_real & 0.205 & 1 & s5\_real & 0.198 \\ \hline
+2 & s6\_real & 0.205 & 2 & s6\_real & 0.198 \\ \hline
+3 & s4\_real & 0.204 & 3 & s4\_real & 0.197 \\ \hline
+4 & s7\_real & 0.203 & 4 & s7\_real & 0.197 \\ \hline
+5 & s8\_real & 0.201 & 5 & s8\_real & 0.195 \\ \hline
+\end{tabular}
+\caption{Principales variables que contribuyen al primer componente principal (PC1).}
+\label{tab:pca_loadings}
+\end{table}
+
+\subsubsection{Visualización del Espacio Latente}
+
+La proyección de los estudiantes en el espacio definido por PC1 y PC2 (Figura \ref{fig:pca_scatter}) revela una gradación continua y nítida respecto a la variable objetivo (\texttt{semestre\_termino}). Los alumnos que egresan en periodos cortos se agrupan en un extremo del eje latente, mientras que aquellos con rezago se desplazan sistemáticamente hacia el polo opuesto. Esta separación natural valida el uso de los componentes principales como predictores robustos para modelos de aprendizaje automático posteriores.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imagenes/pca_scatter_matematicas}
+    \caption{Proyección PCA de trayectorias académicas (Matemáticas), coloreada por el semestre de término activo.}
+    \label{fig:pca_scatter}
+\end{figure}
 
 \end{document}
