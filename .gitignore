@@ -17,3 +17,6 @@ __pycache__/
 .venv/
 env/
 venv/
+Datos/Datos_limpios_activos/*
+!Datos/Datos_limpios_activos/.gitkeep
+
