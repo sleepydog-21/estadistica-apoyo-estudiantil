@@ -1,0 +1,14 @@
+# Ignorar datos pero mantener estructura
+Datos/Datos_crudos/*
+!Datos/Datos_crudos/.gitkeep
+Datos/Datos_limpios/*
+!Datos/Datos_limpios/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+.venv/
+env/
+venv/

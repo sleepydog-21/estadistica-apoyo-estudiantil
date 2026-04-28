@@ -1,0 +1,270 @@
+\documentclass[letterpaper,openright,12pt,openany]{book}
+
+\usepackage{comment}
+
+%\usepackage[latin1]{inputenc}
+
+\usepackage{ marvosym }
+
+%\usepackage{bold-extra}
+\usepackage[utf8]{inputenc} %Permite acentos y demás símbolos directamente
+\usepackage[a4paper,includeall,bindingoffset=0cm,margin=2.5cm,
+            marginparsep=0cm,marginparwidth=0cm]{geometry}
+            
+\usepackage{setspace} 
+	\setstretch{1.25}
+\usepackage{graphicx} %figuras
+\usepackage{subfigure} %subfiguras
+\graphicspath{{Portada/}, {Introduccion/}, {Metodologia/}, {Resultados/Neutros/}, {Resultados/Aniones/}, {Resultados/} {Resultados/Cationes/}} %Localización de las carpetas de imágenes
+
+\usepackage{booktabs} % Top and bottom rules for table
+\usepackage{multirow} % Permite unir celdas de tablas
+\usepackage{rotating}
+\usepackage[font=small,labelfont=bf]{caption} % Requerido para especificar descripción de tablas y figuras 
+\usepackage{wrapfig} % Permite ajustar texto al rededor de tablas y figuras
+\usepackage{longtable} % para tablas largas
+\usepackage{float} % para que las gráficas estén donde quiero
+\usepackage{changepage} %para cambiar margenes
+
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\usepackage{amsmath}% Para partir ecuaciones 
+\usepackage{amsfonts}%Números reales
+\usepackage{ amssymb }%Símbolo ángulo
+
+\usepackage{mathtools}
+
+\usepackage[spanish,es-nodecimaldot]{babel}%para usar puntos como separación decimal
+
+\usepackage{afterpage}%Para agregar páginas en blanco
+\newcommand{\RomanNumeralCaps}[1]%Para escribir números en romano mayúsculos
+    {\MakeUppercase{\romannumeral #1}}
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4} % para que añadir las secciones en el índice...
+
+
+\begin{document}
+\pagenumbering{Roman}
+    \begin{titlepage}
+       \thispagestyle{empty}
+        \begin{minipage}[c][0.17\textheight][c]{0.25\textwidth}
+            \begin{center}
+                \includegraphics[width=3.5cm, height=3.8cm]{unam}
+            \end{center}
+        \end{minipage}
+        \begin{minipage}[c][0.17\textheight][t]{0.65\textwidth}
+            \begin{center}
+                \vspace{.3cm}
+                \textsc{\large Universidad Nacional Autónoma de México}\\[0.5cm]
+                \vspace{.1cm}
+                \hrule height2.5pt
+                \vspace{.1cm}
+                \hrule height1pt
+                \vspace{.8cm}
+                \textsc{\LARGE Facultad de Ciencias}\\[0.8cm] %
+            \end{center}
+        \end{minipage}
+
+     \begin{minipage}[c][0.81\textheight][t]{0.25\textwidth}
+        \vspace*{5mm}
+        \begin{center}
+            %\hskip1mm
+            \vrule width1pt height14cm 
+            \hskip9pt
+            \vrule width2.5pt height14cm
+            \hskip9pt
+            \vrule width1pt height14cm \\
+            \vskip5mm
+            \includegraphics[width=3.8cm, height=4.1cm]{escudoFC}
+        \end{center}
+    \end{minipage}
+    \begin{minipage}[c][0.81\textheight][t]{0.65\textwidth}
+        \begin{center}
+                \vspace{1cm}
+
+                \LARGE Estudio de tendencias académicas mediante estadística inferencial \\[1cm]
+
+                \vspace{0.8cm}            
+
+                \textsc{\Huge T E S I S}\\[1.8cm]
+                \textsc{\large que para obtener el título de}\\[0.7cm]
+                \large Matemátio\\[0.7cm]
+                \textsc{\large p r e s e n t a}\\[0.7cm]
+                \large {Tabaré Merino Sánchez}\\[0.7cm]          
+
+                \textsc{\large Director de tesis:}\\[0.7cm] 
+                \large Dr. Miguel Alcubierre Moya\\[1.3cm]
+
+                %\vspace{0.8cm}
+
+                {Ciudad Universitaria, Ciudad de México, 2026}
+            \end{center}
+            
+        \end{minipage}
+        \afterpage{\null\newpage}
+    \end{titlepage}
+\renewcommand{\tablename}{Tabla}
+
+\begin{enumerate}
+    \item Datos del alumno
+    
+	Merino 
+	\vspace{-2mm}
+	
+	Sánchez 
+	\vspace{-2mm}
+	
+	Tabaré
+	\vspace{-2mm}
+	
+	7771591426
+	\vspace{-2mm}
+	
+	Universidad Nacional Autónoma de México
+	\vspace{-2mm}
+	
+	Facultad de Ciencias
+	\vspace{-2mm}
+	
+	Matemáticas
+	\vspace{-2mm}
+	
+	3822437
+	
+	\item Datos del tutor
+	
+	Dr
+	\vspace{-2mm}
+	
+	Alcubierre
+	\vspace{-2mm}
+	
+	Moya
+	\vspace{-2mm}
+	
+	Miguel
+	
+\end{enumerate}
+
+\afterpage{\null\newpage}
+\tableofcontents % indice de contenidos
+
+\setlength{\parskip}{1.5mm} % espacio entre párrafos
+\pagebreak
+
+\chapter*{Agradecimientos}
+
+\textit{Por último, a cualquier persona que se tome el tiempo de leer mi trabajo. }
+\afterpage{\null\newpage}
+
+\pagenumbering{arabic}
+\chapter*{Resumen}
+
+\chapter{Introducción}
+\chapter{Limpieza de los datos}
+\section{Preparación y limpieza de los datos}
+
+\subsection{Fuente y estructura de los datos}
+
+Los datos utilizados en este estudio provienen del \textit{Vector Excalibur}, un conjunto de
+indicadores académicos que resumen el desempeño de los estudiantes a lo largo de su trayectoria
+universitaria. Para cada licenciatura, la información se encuentra organizada en un archivo de
+Excel compuesto por cuatro hojas, correspondientes a las siguientes dimensiones:
+
+\begin{itemize}
+    \item Regularidad gregoriana,
+    \item Índice de esfuerzo,
+    \item Promedio natural,
+    \item Promedio real.
+\end{itemize}
+
+Cada hoja contiene información a nivel de estudiante, identificada mediante la variable
+\texttt{Cuenta}, así como un conjunto de variables temporales \texttt{s1, s2, \ldots, s20} que
+representan el valor del indicador correspondiente en cada semestre de la trayectoria académica.
+
+\subsection{Criterios de exclusión}
+
+Con el objetivo de garantizar la coherencia temporal de las trayectorias académicas analizadas,
+se excluyeron del estudio todos los estudiantes que presentaron periodos de baja académica,
+identificados mediante las variables \texttt{BD} (baja definitiva) y \texttt{BT} (baja temporal).
+
+La exclusión de estos casos se justifica debido a que no se dispone de información confiable sobre
+la duración efectiva de las interrupciones en la trayectoria académica, lo cual dificulta la
+interpretación de los indicadores semestrales y podría introducir sesgos en el análisis
+estadístico inferencial.
+
+\subsection{Selección y depuración de variables}
+
+Con fines analíticos, se eliminaron del conjunto de datos aquellas variables que no aportan
+información relevante para el estudio de tendencias académicas, tales como el nombre del
+estudiante y  el plan de estudios.
+
+La variable \texttt{generación} se conservó en el conjunto de datos final, ya que permite
+capturar posibles efectos de cohorte asociados a cambios institucionales, académicos o
+contextuales entre distintos años de ingreso.
+
+Asimismo, el análisis se restringió a los primeros ocho semestres de la trayectoria académica
+(\texttt{s1} a \texttt{s8}). Esta decisión se fundamenta en que el rezago académico asociado a la
+condición de Artículo 32 suele manifestarse a partir de etapas tempranas de la licenciatura y en
+que los indicadores disponibles presentan mayor completitud y consistencia en dichos semestres.
+
+\subsection{Integración de las fuentes de información}
+
+Una vez depurados los datos, las cuatro hojas correspondientes a cada dimensión del Vector
+Excalibur se integraron en un único conjunto de datos mediante una unión interna
+(\textit{inner join}), utilizando la variable \texttt{Cuenta} como identificador.
+
+Este procedimiento garantiza que el análisis se realice únicamente sobre estudiantes para los
+cuales se dispone de información completa en las cuatro dimensiones consideradas, evitando la
+introducción de valores faltantes estructurales derivados de la ausencia de alguna fuente de
+información.
+
+\section{Definición de la variable objetivo: semestre de término}
+
+\subsection{Motivación}
+
+Con el fin de estudiar el rezago académico desde una perspectiva cuantitativa, se definió una
+variable objetivo que resume el momento en el que un estudiante concluye su licenciatura, o bien,
+el punto a partir del cual su trayectoria académica se extiende más allá del tiempo
+reglamentario.
+
+Dicha variable permite transformar una trayectoria semestral completa en una medida resumida,
+adecuada para su análisis mediante técnicas de estadística inferencial.
+
+\subsection{Definición operativa}
+
+La variable \texttt{semestre\_termino} se definió utilizando la hoja de \textit{Regularidad
+gregoriana} del Vector Excalibur, de acuerdo con el siguiente criterio:
+
+\begin{itemize}
+    \item Para cada estudiante, se identifica el primer semestre mayor o igual a \texttt{s8} en
+    el que el indicador de regularidad toma el valor igual a 1, lo cual se interpreta como la
+    conclusión de la licenciatura bajo los criterios institucionales.
+    \item En caso de que el estudiante no presente ningún valor igual a 1 a partir del semestre
+    \texttt{s8}, se asigna el valor 20 a la variable \texttt{semestre\_termino}, indicando que la
+    trayectoria académica se extiende hasta el máximo horizonte temporal considerado.
+\end{itemize}
+
+Formalmente, la variable se define como:
+
+\[
+\text{semestre\_termino}_i =
+\begin{cases}
+\min \{ k \geq 8 : s_k^{(i)} = 1 \}, & \text{si existe tal } k, \\
+20, & \text{en otro caso}.
+\end{cases}
+\]
+
+\subsection{Interpretación}
+
+La variable \texttt{semestre\_termino} representa una aproximación cuantitativa al momento de
+conclusión de la licenciatura y constituye la variable objetivo del estudio.
+
+Valores pequeños de \texttt{semestre\_termino} indican trayectorias académicas más cortas,
+mientras que valores grandes sugieren una mayor probabilidad de rezago académico y, en
+particular, un mayor riesgo de encontrarse en condición de Artículo 32.
+
+Esta variable permite vincular de manera directa los indicadores semestrales del Vector
+Excalibur con el análisis de tendencias académicas mediante modelos estadísticos explicables.
+
+\end{document}
