@@ -22,27 +22,30 @@ for i, carrera in enumerate(carreras):
         
     df = pd.read_excel(archivo)
     
-    # Caso 1: Todos (imputando 20)
+    # Caso 1: Todos (imputando 20) -> Sesgo hacia ARRIBA
     df_all = df.copy()
     df_all['semestre_termino'] = df_all['semestre_termino'].fillna(20)
     media_all = df_all.groupby('Generación')['semestre_termino'].mean()
     
-    # Caso 2: Solo Titulados (excluyendo los que no han terminado)
-    # Filtramos los que tienen NaN o 20 (si es que ya había 20s reales, aunque usualmente son censura)
+    # Caso 2: Solo Titulados -> Sesgo hacia ABAJO (solo vemos a los rápidos)
     df_tit = df.dropna(subset=['semestre_termino'])
     df_tit = df_tit[df_tit['semestre_termino'] < 20]
     media_tit = df_tit.groupby('Generación')['semestre_termino'].mean()
     
     # Plotting
-    color = 'blue' if i == 0 else 'green'
-    plt.plot(media_all.index, media_all.values, marker='o', label=f"{carrera} (Todos, censura 20)", color=color, linestyle='-')
-    plt.plot(media_tit.index, media_tit.values, marker='s', label=f"{carrera} (Solo Titulados)", color=color, linestyle='--', alpha=0.6)
+    if i == 0: # Matemáticas
+        col_main, col_sub = '#1f77b4', '#aec7e8' # Azul fuerte y claro
+    else: # Física
+        col_main, col_sub = '#d62728', '#ff9896' # Rojo fuerte y claro
+        
+    plt.plot(media_all.index, media_all.values, marker='o', label=f"{carrera} (Muestra Total - Sesgo Superior)", color=col_main, linewidth=2)
+    plt.plot(media_tit.index, media_tit.values, marker='s', label=f"{carrera} (Solo Titulados - Sesgo Inferior)", color=col_sub, linestyle='--', alpha=0.8)
 
-plt.title("Impacto de la Censura en la Media de Graduación por Generación", fontsize=16)
+plt.title("El Paradox de la Censura: Sesgos Opuestos en la Media Generacional", fontsize=16)
 plt.xlabel("Generación", fontsize=12)
 plt.ylabel("Media Semestre de Término", fontsize=12)
-plt.legend()
-plt.grid(True, which='both', linestyle='--', alpha=0.5)
+plt.legend(fontsize='small', frameon=True)
+plt.grid(True, which='both', linestyle='--', alpha=0.3)
 
 # Guardar
 plt.savefig(IMAGENES / "comparativa_censura_media.png", dpi=300, bbox_inches='tight')

@@ -15,12 +15,14 @@ Al graficar la media del semestre de término corregido por generación, se obse
 
 Sin embargo, es fundamental notar que la crecida abrupta que se observa a partir de la generación 2017 no necesariamente implica un deterioro súbito en el rendimiento académico, sino que responde a un artefacto de la \textbf{censura informativa}. En las cohortes más recientes, los estudiantes que eventualmente tardarán 14, 16 o 18 semestres en titularse aún no han transcurrido ese tiempo en la facultad; por lo tanto, en la base de datos actual son contabilizados preventivamente con el valor máximo de 20 semestres.
 
-Para validar esta hipótesis, se generó una comparativa (Figura \ref{fig:comparativa_censura}) contrastando la media total contra la media calculada únicamente sobre los alumnos que ya han concluido sus créditos. Se observa que, al excluir los datos censurados, la tendencia se mantiene estable o incluso descendente en los años recientes, confirmando que el repunte es una distorsión temporal. Este fenómeno de subestimación del éxito y sobreestimación del rezago en cohortes jóvenes será abordado con mayor profundidad en las secciones dedicadas al análisis de supervivencia.
+Para validar esta hipótesis, se generó una comparativa (Figura \ref{fig:comparativa_censura}) que ilustra el "paradox de la censura". Por un lado, la media de la muestra total presenta un \textit{sesgo superior}, pues infla artificialmente el tiempo de egreso de los alumnos pendientes. Por otro lado, la media de "Solo Titulados" presenta un \textit{sesgo inferior} en las generaciones recientes, ya que en estas cohortes solo han tenido tiempo de concluir los estudiantes más eficientes (aquellos con trayectorias de 8 o 9 semestres), ocultando a quienes egresarán con rezago natural. 
+
+Se observa que la realidad académica se encuentra en el espacio no observado entre ambas líneas. Confirmar que el repunte es una distorsión temporal es vital, y justifica el uso posterior de técnicas de análisis de supervivencia para obtener estimaciones insesgadas.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{imagenes/comparativa_censura_media.png}
-    \caption{Impacto de la censura en la media generacional: Comparativa entre la muestra total (censurada en $k=20$) y la subpoblación de titulados.}
+    \caption{El Paradox de la Censura: Comparativa entre el sesgo superior (muestra total) y el sesgo inferior (subpoblación de titulados rápidos).}
     \label{fig:comparativa_censura}
 \end{figure}
 
