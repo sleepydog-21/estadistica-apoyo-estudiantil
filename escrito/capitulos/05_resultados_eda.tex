@@ -8,17 +8,20 @@ Para entender la estructura de los datos, se calcularon las matrices de correlac
 
 \begin{figure}[H]
     \centering
-    \begin{minipage}{0.48\textwidth}
+    \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{imagenes/heatmap_matematicas.png}
-        \caption{Mapa de calor (Matemáticas).}
-    \end{minipage}
+        \includegraphics[width=\linewidth]{imagenes/heatmap_matematicas.png}
+        \caption{Matemáticas}
+        \label{fig:heatmap_matematicas}
+    \end{subfigure}
     \hfill
-    \begin{minipage}{0.48\textwidth}
+    \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{imagenes/heatmap_fisica.png}
-        \caption{Mapa de calor (Física).}
-    \end{minipage}
+        \includegraphics[width=\linewidth]{imagenes/heatmap_fisica.png}
+        \caption{Física}
+        \label{fig:heatmap_fisica}
+    \end{subfigure}
+    \caption{Matrices de correlación para las variables de los primeros ocho semestres.}
     \label{fig:heatmaps}
 \end{figure}
 
@@ -76,17 +79,20 @@ El análisis mediante diagramas de caja (Figura \ref{fig:eda_boxplot}) permite o
 
 \begin{figure}[H]
     \centering
-    \begin{minipage}{0.48\textwidth}
+    \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{imagenes/eda_boxplot_gen_matematicas.png}
-        \caption{Distribución por generación (Matemáticas).}
-    \end{minipage}
+        \includegraphics[width=\linewidth]{imagenes/eda_boxplot_gen_matematicas.png}
+        \caption{Matemáticas}
+        \label{fig:eda_boxplot_matematicas}
+    \end{subfigure}
     \hfill
-    \begin{minipage}{0.48\textwidth}
+    \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{imagenes/eda_boxplot_gen_fisica.png}
-        \caption{Distribución por generación (Física).}
-    \end{minipage}
+        \includegraphics[width=\linewidth]{imagenes/eda_boxplot_gen_fisica.png}
+        \caption{Física}
+        \label{fig:eda_boxplot_fisica}
+    \end{subfigure}
+    \caption{Distribución del semestre de término por generación para Matemáticas y Física.}
     \label{fig:eda_boxplot}
 \end{figure}
 
@@ -98,17 +104,20 @@ Como se ilustra en la Figura \ref{fig:evolucion_metricas}, la separación entre 
 
 \begin{figure}[H]
     \centering
-    \begin{minipage}{0.48\textwidth}
+    \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{imagenes/evolucion_metricas_matematicas.png}
-        \caption{Evolución de métricas con CI (Matemáticas).}
-    \end{minipage}
+        \includegraphics[width=\linewidth]{imagenes/evolucion_metricas_matematicas.png}
+        \caption{Matemáticas}
+        \label{fig:evolucion_matematicas}
+    \end{subfigure}
     \hfill
-    \begin{minipage}{0.48\textwidth}
+    \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{imagenes/evolucion_metricas_fisica.png}
-        \caption{Evolución de métricas con CI (Física).}
-    \end{minipage}
+        \includegraphics[width=\linewidth]{imagenes/evolucion_metricas_fisica.png}
+        \caption{Física}
+        \label{fig:evolucion_fisica}
+    \end{subfigure}
+    \caption{Evolución de métricas académicas con intervalos de confianza (95\%) para grupos extremos.}
     \label{fig:evolucion_metricas}
 \end{figure}
 
@@ -126,17 +135,20 @@ Sin embargo, para garantizar una representación robusta que capture no solo el 
 
 \begin{figure}[H]
     \centering
-    \begin{minipage}{0.48\textwidth}
+    \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{imagenes/pca_scree_matematicas.png}
-        \caption{Scree Plot (Matemáticas).}
-    \end{minipage}
+        \includegraphics[width=\linewidth]{imagenes/pca_scree_matematicas.png}
+        \caption{Matemáticas}
+        \label{fig:pca_scree_matematicas}
+    \end{subfigure}
     \hfill
-    \begin{minipage}{0.48\textwidth}
+    \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{imagenes/pca_scree_fisica.png}
-        \caption{Scree Plot (Física).}
-    \end{minipage}
+        \includegraphics[width=\linewidth]{imagenes/pca_scree_fisica.png}
+        \caption{Física}
+        \label{fig:pca_scree_fisica}
+    \end{subfigure}
+    \caption{Scree Plots que muestran la varianza explicada por componente para ambas carreras.}
     \label{fig:pca_scree}
 \end{figure}
 
@@ -156,47 +168,27 @@ Var. Acumulada (Fís) & 75.8\% & 82.0\% & 86.8\% & 89.2\% & 90.9\% \\ \hline
 
 \subsubsection{Interpretación Multivariada de los Componentes}
 
-El análisis de las cargas (\textit{loadings}) revela la naturaleza pedagógica de cada componente. Al utilizar un doble esquema de coloración ---por métrica y por semestre--- es posible identificar patrones de comportamiento específicos.
+El análisis de las cargas (\textit{loadings}) revela la naturaleza pedagógica de cada componente. Dada la complejidad de las interacciones, se generaron visiones consolidadas para los primeros cinco componentes principales, contrastando las dos licenciaturas bajo dos esquemas de coloración: por métrica académica y por semestre.
 
-\paragraph{PC1: El Factor de Rendimiento Global.}
-El primer componente (Figura \ref{fig:pca_loadings_pc1}) actúa como un promedio ponderado positivo de todas las variables. No presenta agrupamientos semestrales marcados, lo que indica que mide la "calidad académica" constante del alumno a lo largo de toda su formación inicial.
-
-\begin{figure}[H]
-    \centering
-    \begin{minipage}{0.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{imagenes/pca_loadings_detalle/loadings_pc1_matematicas_metrica.png}
-        \caption{PC1 por métrica (Matemáticas).}
-    \end{minipage}
-    \hfill
-    \begin{minipage}{0.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{imagenes/pca_loadings_detalle/loadings_pc1_fisica_metrica.png}
-        \caption{PC1 por métrica (Física).}
-    \end{minipage}
-    \label{fig:pca_loadings_pc1}
-\end{figure}
-
-\paragraph{PC2: El Factor de Evolución y Contraste.}
-El segundo componente captura la dinámica temporal. En la Figura \ref{fig:pca_loadings_pc2}, coloreada por semestre, se observa una separación nítida entre los primeros semestres (S1-S4) y los finales (S5-S8). El PC2 identifica así a los estudiantes cuya trayectoria no es uniforme, diferenciando entre aquellos que mejoran su rendimiento con el tiempo frente a los que experimentan un declive a mitad de la carrera.
+\paragraph{Estructura por Métrica (PC1-PC5).}
+Como se observa en la Figura \ref{fig:pca_loadings_master_metric}, el \textbf{PC1} actúa uniformemente como un índice de rendimiento global en ambas carreras. Los componentes subsecuentes empiezan a capturar contrastes entre tipos de variables; por ejemplo, el PC3 en Matemáticas muestra un peso diferenciado para la \textit{Regularidad} frente al \textit{Esfuerzo}, permitiendo identificar perfiles de alumnos que, aunque aprueban (alta regularidad), lo hacen con una carga académica reducida.
 
 \begin{figure}[H]
     \centering
-    \begin{minipage}{0.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{imagenes/pca_loadings_detalle/loadings_pc2_matematicas_semestre.png}
-        \caption{PC2 por semestre (Matemáticas).}
-    \end{minipage}
-    \hfill
-    \begin{minipage}{0.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{imagenes/pca_loadings_detalle/loadings_pc2_fisica_semestre.png}
-        \caption{PC2 por semestre (Física).}
-    \end{minipage}
-    \label{fig:pca_loadings_pc2}
+    \includegraphics[width=0.95\textwidth]{imagenes/pca_loadings_master_metric.png}
+    \caption{Cargas (loadings) consolidadas de los primeros cinco componentes principales, coloreadas por tipo de métrica académica.}
+    \label{fig:pca_loadings_master_metric}
 \end{figure}
 
-Los componentes PC3 a PC5 (cuyas gráficas se encuentran en el anexo) capturan variaciones más finas, como el contraste entre el \textit{Índice de Esfuerzo} y la \textit{Regularidad}, permitiendo al modelo posterior distinguir perfiles de estudiantes con altos promedios pero trayectorias administrativas irregulares.
+\paragraph{Estructura por Semestre (PC1-PC5).}
+Al analizar la evolución temporal (Figura \ref{fig:pca_loadings_master_semester}), el \textbf{PC2} destaca como el principal factor de cambio. En ambas carreras, pero especialmente en Matemáticas, el PC2 separa nítidamente los semestres iniciales (colores oscuros) de los finales (colores claros). Este componente identifica a estudiantes con trayectorias no lineales, como aquellos que presentan un declive en el rendimiento tras los primeros dos años de formación.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{imagenes/pca_loadings_master_semester.png}
+    \caption{Cargas (loadings) consolidadas de los primeros cinco componentes principales, coloreadas por semestre (S1-S8).}
+    \label{fig:pca_loadings_master_semester}
+\end{figure}
 
 \subsubsection{Visualización del Espacio Latente}
 
@@ -204,17 +196,20 @@ La proyección de los estudiantes en el espacio definido por PC1 y PC2 (Figura \
 
 \begin{figure}[H]
     \centering
-    \begin{minipage}{0.48\textwidth}
+    \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{imagenes/pca_scatter_matematicas.png}
-        \caption{Proyección latente (Matemáticas).}
-    \end{minipage}
+        \includegraphics[width=\linewidth]{imagenes/pca_scatter_matematicas.png}
+        \caption{Matemáticas}
+        \label{fig:pca_scatter_matematicas}
+    \end{subfigure}
     \hfill
-    \begin{minipage}{0.48\textwidth}
+    \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{imagenes/pca_scatter_fisica.png}
-        \caption{Proyección latente (Física).}
-    \end{minipage}
+        \includegraphics[width=\linewidth]{imagenes/pca_scatter_fisica.png}
+        \caption{Física}
+        \label{fig:pca_scatter_fisica}
+    \end{subfigure}
+    \caption{Proyección de los datos en el espacio de los dos primeros componentes principales para Matemáticas y Física.}
     \label{fig:pca_scatter}
 \end{figure}
 
