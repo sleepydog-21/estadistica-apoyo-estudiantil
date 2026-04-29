@@ -31,6 +31,30 @@ El análisis mediante diagramas de caja (Figura \ref{fig:eda_boxplot}) permite o
     \label{fig:eda_boxplot}
 \end{figure}
 
+\subsection{Divergencia de Trayectorias Académicas}
+
+Para comprender la naturaleza del rezago, es imperativo analizar la evolución temporal de los indicadores de desempeño durante el periodo inicial de formación (S1-S8). Al agrupar a los estudiantes según su tiempo final de egreso ---comparando a quienes no presentan rezago frente a quienes experimentan rezago severo--- se observa un fenómeno de divergencia sistemática y prematura.
+
+Como se ilustra en la Figura \ref{fig:evolucion_metricas}, la separación entre los perfiles académicos no ocurre al final de la trayectoria reglamentaria, sino que comienza a manifestarse desde el segundo y tercer semestre. Los intervalos de confianza al 95\% (áreas sombreadas) confirman que estas diferencias son estadísticamente significativas desde etapas muy tempranas, especialmente en variables críticas como el \textit{Promedio Real} y el \textit{Índice de Esfuerzo}.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imagenes/evolucion_metricas_matematicas.png}
+        \caption{Evolución de métricas con CI (Matemáticas).}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imagenes/evolucion_metricas_fisica.png}
+        \caption{Evolución de métricas con CI (Física).}
+    \end{minipage}
+    \label{fig:evolucion_metricas}
+\end{figure}
+
+Esta evidencia sugiere que el éxito o fracaso académico está fuertemente condicionado por la "inercia" adquirida en los primeros dos años de la carrera, validando la hipótesis de que el rezago es un proceso acumulativo y no un evento aislado del egreso.
+
 \subsection{Análisis de Componentes Principales (PCA)}
 
 Dada la alta dimensionalidad de los predictores (32 variables capturando esfuerzo, promedio y regularidad a lo largo de 8 semestres), se implementó un Análisis de Componentes Principales (PCA) para reducir la complejidad del espacio de estados. El análisis se restringió exclusivamente a los alumnos con trayectorias iniciales completas (S1-S8).
