@@ -30,9 +30,14 @@ for carrera in carreras:
     df = pd.read_excel(archivo)
     df['semestre_termino'] = df['semestre_termino'].fillna(20)
     
-    # Definir grupos por semestre de término
-    bins = [0, 10, 12, 15, 20]
-    labels = ['Graduación Ideal (9-10)', 'Rezago Leve (11-12)', 'Rezago Medio (13-15)', 'Rezago Severo/Censura (16-20)']
+    # Definir grupos por semestre de término específicos por carrera
+    if "Mat" in carrera:
+        bins = [0, 8, 12, 15, 20]
+        labels = ['Ideal (<= 8)', 'Leve (9-12)', 'Medio (13-15)', 'Severo/Censura (16-20)']
+    else: # Física
+        bins = [0, 9, 12, 15, 20]
+        labels = ['Ideal (<= 9)', 'Leve (10-12)', 'Medio (13-15)', 'Severo/Censura (16-20)']
+        
     df['grupo'] = pd.cut(df['semestre_termino'], bins=bins, labels=labels)
     
     # Filtrar solo alumnos con 8 semestres completos para que la línea sea continua
