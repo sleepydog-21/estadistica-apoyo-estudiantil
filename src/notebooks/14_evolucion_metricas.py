@@ -73,7 +73,7 @@ for carrera in carreras:
     plt.tight_layout()
     
     # Guardar
-    nombre_img = f"evolucion_metricas_{carrera.lower().replace('á', 'a')}.png"
+    nombre_img = f"evolucion_metricas_{'matematicas' if 'Mat' in carrera else 'fisica'}.png"
     plt.savefig(IMAGENES / nombre_img, dpi=300, bbox_inches='tight')
     plt.close()
 
