@@ -13,6 +13,17 @@ Al graficar la media del semestre de término corregido por generación, se obse
     \label{fig:eda_media}
 \end{figure}
 
+Sin embargo, es fundamental notar que la crecida abrupta que se observa a partir de la generación 2017 no necesariamente implica un deterioro súbito en el rendimiento académico, sino que responde a un artefacto de la \textbf{censura informativa}. En las cohortes más recientes, los estudiantes que eventualmente tardarán 14, 16 o 18 semestres en titularse aún no han transcurrido ese tiempo en la facultad; por lo tanto, en la base de datos actual son contabilizados preventivamente con el valor máximo de 20 semestres.
+
+Para validar esta hipótesis, se generó una comparativa (Figura \ref{fig:comparativa_censura}) contrastando la media total contra la media calculada únicamente sobre los alumnos que ya han concluido sus créditos. Se observa que, al excluir los datos censurados, la tendencia se mantiene estable o incluso descendente en los años recientes, confirmando que el repunte es una distorsión temporal. Este fenómeno de subestimación del éxito y sobreestimación del rezago en cohortes jóvenes será abordado con mayor profundidad en las secciones dedicadas al análisis de supervivencia.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imagenes/comparativa_censura_media.png}
+    \caption{Impacto de la censura en la media generacional: Comparativa entre la muestra total (censurada en $k=20$) y la subpoblación de titulados.}
+    \label{fig:comparativa_censura}
+\end{figure}
+
 El análisis mediante diagramas de caja (Figura \ref{fig:eda_boxplot}) permite observar que, en las generaciones con trayectorias maduras (2009-2012), el rezago era un evento atípico. Sin embargo, conforme avanzamos hacia 2018, la mediana se desplaza hacia valores superiores a 12 semestres, evidenciando una mayor dispersión en los tiempos de egreso.
 
 \begin{figure}[H]
