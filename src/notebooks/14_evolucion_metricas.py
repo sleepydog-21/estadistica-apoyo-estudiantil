@@ -33,15 +33,14 @@ for carrera in carreras:
     # Definir grupos por semestre de término específicos por carrera
     if "Mat" in carrera:
         bins = [0, 8, 12, 15, 20]
-        labels = ['Ideal (<= 8)', 'Leve (9-12)', 'Medio (13-15)', 'Severo/Censura (16-20)']
+        labels = ['Sin Rezago (<= 8)', 'Rezago Leve (9-12)', 'Rezago Medio (13-15)', 'Rezago Severo (16-20)']
     else: # Física
         bins = [0, 9, 12, 15, 20]
-        labels = ['Ideal (<= 9)', 'Leve (10-12)', 'Medio (13-15)', 'Severo/Censura (16-20)']
+        labels = ['Sin Rezago (<= 9)', 'Rezago Leve (10-12)', 'Rezago Medio (13-15)', 'Rezago Severo (16-20)']
         
     df['grupo'] = pd.cut(df['semestre_termino'], bins=bins, labels=labels)
     
-    # Filtrar solo alumnos con 8 semestres completos para que la línea sea continua
-    # (Siguiendo la lógica del PCA anterior)
+    # Filtrar solo alumnos con 8 semestres completos
     cols_s1_s8 = [f's{i}_{m}' for i in range(1, 9) for m in metrics]
     df_clean = df.dropna(subset=cols_s1_s8)
     
@@ -53,15 +52,14 @@ for carrera in carreras:
     for i, metric in enumerate(metrics):
         ax = axes[i]
         
-        # Preparar datos para el plot
+        # Preparar datos para el plot (usamos raw data para que Seaborn calcule CI)
         cols = [f's{j}_{metric}' for j in range(1, 9)]
-        df_metric = df_clean.groupby('grupo', observed=True)[cols].mean().reset_index()
+        df_metric_raw = df_clean[['grupo'] + cols].melt(id_vars='grupo', var_name='Semestre', value_name='Valor')
+        df_metric_raw['Semestre'] = df_metric_raw['Semestre'].str.extract('(\d+)').astype(int)
         
-        # Melt para seaborn
-        df_melt = df_metric.melt(id_vars='grupo', var_name='Semestre', value_name='Valor')
-        df_melt['Semestre'] = df_melt['Semestre'].str.extract('(\d+)').astype(int)
-        
-        sns.lineplot(data=df_melt, x='Semestre', y='Valor', hue='grupo', marker='o', ax=ax, palette=palette, linewidth=2.5)
+        # Lineplot con raw data automáticamente añade sombreado para CI (95%)
+        sns.lineplot(data=df_metric_raw, x='Semestre', y='Valor', hue='grupo', 
+                     marker='o', ax=ax, palette=palette, linewidth=2.5, errorbar=('ci', 95))
         
         ax.set_title(f"Evolución de {metric_names[metric]} (S1-S8)", fontsize=14)
         ax.set_xlabel("Semestre")
