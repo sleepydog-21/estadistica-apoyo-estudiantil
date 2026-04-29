@@ -2,6 +2,52 @@
 
 Tras la aplicación de la metodología de Tiempo Activo, se procedió a un análisis exploratorio profundo de las trayectorias resultantes. El objetivo es identificar los patrones subyacentes que rigen el rezago académico en la Facultad de Ciencias.
 
+\subsection{Correlaciones y Dependencias}
+
+Para entender la estructura de los datos, se calcularon las matrices de correlación para todas las variables académicas (S1-S8). Los mapas de calor (Figura \ref{fig:heatmaps}) muestran una altísima multicolinealidad, especialmente entre los \textit{Promedios Reales} y la \textit{Regularidad}.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imagenes/heatmap_matematicas.png}
+        \caption{Mapa de calor (Matemáticas).}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imagenes/heatmap_fisica.png}
+        \caption{Mapa de calor (Física).}
+    \end{minipage}
+    \label{fig:heatmaps}
+\end{figure}
+
+Más allá de la estructura interna, es fundamental identificar qué variables tienen mayor peso predictivo sobre el \textbf{semestre de término}. En la Tabla \ref{tab:correlaciones_target} se presentan las 10 variables con mayor correlación negativa respecto al objetivo. Valores cercanos a -1 indican que un incremento en dicha variable se asocia con una graduación más temprana.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|c|l|c|c|l|c|}
+\hline
+\multicolumn{3}{|c|}{\textbf{Matemáticas}} & \multicolumn{3}{c|}{\textbf{Física}} \\ \hline
+\textbf{Rango} & \textbf{Variable} & \textbf{Correlación} & \textbf{Rango} & \textbf{Variable} & \textbf{Correlación} \\ \hline
+1 & s8\_reg & -0.818 & 1 & s8\_reg & -0.785 \\ \hline
+2 & s8\_real & -0.722 & 2 & s7\_reg & -0.754 \\ \hline
+3 & s7\_reg & -0.700 & 3 & s6\_reg & -0.732 \\ \hline
+4 & s6\_reg & -0.646 & 4 & s8\_real & -0.713 \\ \hline
+5 & s8\_esf & -0.638 & 5 & s5\_reg & -0.708 \\ \hline
+6 & s5\_reg & -0.609 & 6 & s4\_reg & -0.683 \\ \hline
+7 & s7\_real & -0.595 & 7 & s7\_real & -0.675 \\ \hline
+8 & s4\_reg & -0.572 & 8 & s6\_real & -0.656 \\ \hline
+9 & s6\_real & -0.548 & 9 & s3\_reg & -0.639 \\ \hline
+10 & s7\_esf & -0.532 & 10 & s5\_real & -0.633 \\ \hline
+\end{tabular}
+\caption{Top 10 variables con mayor correlación negativa respecto al semestre de término. La regularidad de los semestres finales (S6-S8) aparece como el predictor más fuerte en ambas licenciaturas.}
+\label{tab:correlaciones_target}
+\end{table}
+
+Se observa que la \textbf{Regularidad en el semestre 8} (\texttt{s8\_reg}) es el predictor más potente en ambas carreras. Esto confirma que la capacidad de mantenerse al día con los créditos al cierre del segundo año es el indicador más fiable del tiempo final de egreso.
+
 \subsection{Evolución del Rezago por Generación}
 
 Al graficar la media del semestre de término corregido por generación, se observa una tendencia ascendente en las cohortes más recientes. Este fenómeno, ilustrado en la Figura \ref{fig:eda_media}, refleja el efecto de la censura informativa: los alumnos que terminan en periodos cortos ya han egresado, mientras que la población que experimentará rezago prolongado aún permanece activa en la base de datos.
@@ -72,9 +118,27 @@ Esta evidencia sugiere que el éxito o fracaso académico está fuertemente cond
 
 Dada la alta dimensionalidad de los predictores (32 variables capturando esfuerzo, promedio y regularidad a lo largo de 8 semestres), se implementó un Análisis de Componentes Principales (PCA) para reducir la complejidad del espacio de estados. El análisis se restringió exclusivamente a los alumnos con trayectorias iniciales completas (S1-S8).
 
-\subsubsection{Varianza Explicada y Estructura de Datos}
+\subsubsection{Varianza Explicada y Selección de Componentes}
 
-Como se detalla en la Tabla \ref{tab:pca_varianza}, el primer componente principal (PC1) captura una proporción masiva de la varianza total (68.9\% en Matemáticas y 75.8\% en Física). Esto sugiere que la trayectoria académica está dominada por un "perfil de rendimiento general" altamente consistente.
+Para determinar el número óptimo de dimensiones, se analizaron los \textit{Scree Plots} (Figura \ref{fig:pca_scree}). Se observa un "codo" muy pronunciado tras el primer componente, lo que indica que una gran parte de la variabilidad académica puede ser resumida en un solo índice.
+
+Sin embargo, para garantizar una representación robusta que capture no solo el promedio sino también la evolución del estudiante, se seleccionaron los primeros \textbf{cinco componentes principales}. Como se detalla en la Tabla \ref{tab:pca_varianza}, este conjunto permite explicar aproximadamente el 90\% de la varianza total en ambos sets de datos (88.5\% en Matemáticas y 90.9\% en Física), logrando una reducción de dimensionalidad del 84\% (de 32 a 5 variables) con una pérdida mínima de información.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imagenes/pca_scree_matematicas.png}
+        \caption{Scree Plot (Matemáticas).}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imagenes/pca_scree_fisica.png}
+        \caption{Scree Plot (Física).}
+    \end{minipage}
+    \label{fig:pca_scree}
+\end{figure}
 
 \begin{table}[H]
 \centering
@@ -86,49 +150,57 @@ Var. Acumulada (Mat) & 68.9\% & 76.9\% & 83.2\% & 86.3\% & 88.5\% \\ \hline
 Var. Individual (Fís) & 75.8\% & 6.2\% & 4.7\% & 2.4\% & 1.7\% \\ \hline
 Var. Acumulada (Fís) & 75.8\% & 82.0\% & 86.8\% & 89.2\% & 90.9\% \\ \hline
 \end{tabular}
-\caption{Porcentaje de varianza explicada por los primeros cinco componentes principales.}
+\caption{Porcentaje de varianza explicada. Los primeros 5 componentes capturan la gran mayoría de la inercia académica.}
 \label{tab:pca_varianza}
 \end{table}
 
-\subsubsection{Interpretación de los Loadings}
+\subsubsection{Interpretación Multivariada de los Componentes}
 
-Al analizar las cargas (loadings) del PC1, se observa que las variables con mayor peso son los \textbf{Promedios Reales} de los semestres intermedios (S4-S8), como se muestra en la Tabla \ref{tab:pca_loadings}. Esto indica que la "inercia académica" alcanzada a mitad de la carrera es el factor determinante en la configuración de la trayectoria estudiantil.
+El análisis de las cargas (\textit{loadings}) revela la naturaleza pedagógica de cada componente. Al utilizar un doble esquema de coloración ---por métrica y por semestre--- es posible identificar patrones de comportamiento específicos.
+
+\paragraph{PC1: El Factor de Rendimiento Global.}
+El primer componente (Figura \ref{fig:pca_loadings_pc1}) actúa como un promedio ponderado positivo de todas las variables. No presenta agrupamientos semestrales marcados, lo que indica que mide la "calidad académica" constante del alumno a lo largo de toda su formación inicial.
 
 \begin{figure}[H]
     \centering
     \begin{minipage}{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{imagenes/pca_loadings_matematicas.png}
-        \caption{Loadings PCA (Matemáticas).}
+        \includegraphics[width=\textwidth]{imagenes/pca_loadings_detalle/loadings_pc1_matematicas_metrica.png}
+        \caption{PC1 por métrica (Matemáticas).}
     \end{minipage}
     \hfill
     \begin{minipage}{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{imagenes/pca_loadings_fisica.png}
-        \caption{Loadings PCA (Física).}
+        \includegraphics[width=\textwidth]{imagenes/pca_loadings_detalle/loadings_pc1_fisica_metrica.png}
+        \caption{PC1 por métrica (Física).}
     \end{minipage}
-    \label{fig:pca_loadings}
+    \label{fig:pca_loadings_pc1}
 \end{figure}
 
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|l|c|l|l|c|}
-\hline
-\multicolumn{3}{|c|}{\textbf{Matemáticas}} & \multicolumn{3}{c|}{\textbf{Física}} \\ \hline
-\textbf{Rango} & \textbf{Variable} & \textbf{PC1} & \textbf{Rango} & \textbf{Variable} & \textbf{PC1} \\ \hline
-1 & s5\_real & 0.205 & 1 & s5\_real & 0.198 \\ \hline
-2 & s6\_real & 0.205 & 2 & s6\_real & 0.198 \\ \hline
-3 & s4\_real & 0.204 & 3 & s4\_real & 0.197 \\ \hline
-4 & s7\_real & 0.203 & 4 & s7\_real & 0.197 \\ \hline
-5 & s8\_real & 0.201 & 5 & s8\_real & 0.195 \\ \hline
-\end{tabular}
-\caption{Principales variables que contribuyen al primer componente principal (PC1).}
-\label{tab:pca_loadings}
-\end{table}
+\paragraph{PC2: El Factor de Evolución y Contraste.}
+El segundo componente captura la dinámica temporal. En la Figura \ref{fig:pca_loadings_pc2}, coloreada por semestre, se observa una separación nítida entre los primeros semestres (S1-S4) y los finales (S5-S8). El PC2 identifica así a los estudiantes cuya trayectoria no es uniforme, diferenciando entre aquellos que mejoran su rendimiento con el tiempo frente a los que experimentan un declive a mitad de la carrera.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imagenes/pca_loadings_detalle/loadings_pc2_matematicas_semestre.png}
+        \caption{PC2 por semestre (Matemáticas).}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imagenes/pca_loadings_detalle/loadings_pc2_fisica_semestre.png}
+        \caption{PC2 por semestre (Física).}
+    \end{minipage}
+    \label{fig:pca_loadings_pc2}
+\end{figure}
+
+Los componentes PC3 a PC5 (cuyas gráficas se encuentran en el anexo) capturan variaciones más finas, como el contraste entre el \textit{Índice de Esfuerzo} y la \textit{Regularidad}, permitiendo al modelo posterior distinguir perfiles de estudiantes con altos promedios pero trayectorias administrativas irregulares.
 
 \subsubsection{Visualización del Espacio Latente}
 
-La proyección de los estudiantes en el espacio definido por PC1 y PC2 (Figura \ref{fig:pca_scatter}) revela una gradación continua y nítida respecto a la variable objetivo (\texttt{semestre\_termino}). Los alumnos que egresan en periodos cortos se agrupan en un extremo del eje latente, mientras que aquellos con rezago se desplazan sistemáticamente hacia el polo opuesto. Esta separación natural valida el uso de los componentes principales como predictores robustos para modelos de aprendizaje automático posteriores.
+La proyección de los estudiantes en el espacio definido por PC1 y PC2 (Figura \ref{fig:pca_scatter}) revela una gradación continua y nítida respecto a la variable objetivo (\texttt{semestre\_termino}). Los alumnos que egresan en periodos cortos se agrupan en un extremo del eje latente, mientras que aquellos con rezago se desplazan sistemáticamente hacia el polo opuesto. 
 
 \begin{figure}[H]
     \centering
@@ -145,3 +217,7 @@ La proyección de los estudiantes en el espacio definido por PC1 y PC2 (Figura \
     \end{minipage}
     \label{fig:pca_scatter}
 \end{figure}
+
+Esta separación natural valida que, a pesar de los solapamientos individuales discutidos anteriormente, la combinación de estos cinco componentes proporciona una base sólida y eficiente para la construcción de modelos predictivos de rezago académico.
+
+Es relevante notar que, aunque el PC1 captura la "inercia" académica con una correlación de aproximadamente -0.68 respecto al semestre de término, existen variables individuales como la \texttt{s8\_reg} que presentan correlaciones superiores (hasta -0.82). Esto sugiere que el PCA, al actuar como un sintetizador de toda la trayectoria (S1-S8), diluye ligeramente la señal crítica de los estados finales en favor de una visión de conjunto. Esta observación justifica la necesidad de utilizar no solo el PC1, sino el conjunto de los primeros cinco componentes para recuperar la complejidad de la trayectoria y mejorar la precisión de las inferencias posteriores.
