@@ -1,0 +1,43 @@
+\chapter{Dinámica Temporal y Análisis de Supervivencia}
+
+En este capítulo se abandona la visión estática de las cohortes para profundizar en la evolución temporal de los estudiantes. Utilizando técnicas de análisis de supervivencia, se estima la probabilidad real de egreso corrigiendo el sesgo de censura informativa identificado previamente.
+
+\section{Estimación de Kaplan-Meier por Licenciatura}
+
+La Figura \ref{fig:supervivencia_global} muestra la probabilidad de permanecer sin titularse en función del tiempo activo. Se observa una diferencia estructural entre ambas carreras: mientras que en Física la mediana de egreso se sitúa en los 17 semestres, en Matemáticas más del 50\% de la población no alcanza la titulación dentro del periodo de observación (20 semestres).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imagenes/supervivencia_global.png}
+    \caption{Curvas de supervivencia global para Matemáticas y Física. Las líneas punteadas indican los tiempos ideales de egreso (S8 y S9).}
+    \label{fig:supervivencia_global}
+\end{figure}
+
+\section{Trayectorias y Perfiles de Egreso}
+
+Para entender el origen de estas diferencias, se analizaron las trayectorias secuenciales del promedio real en contraste con las curvas de supervivencia.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{imagenes/analisis_dual_supervivencia_series_matematicas.png}
+        \caption{Matemáticas}
+    \end{subfigure}
+    \\[2ex]
+    \begin{subfigure}[b]{\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{imagenes/analisis_dual_supervivencia_series_fisica.png}
+        \caption{Física}
+    \end{subfigure}
+    \caption{Análisis dual: Supervivencia (izquierda) y Trayectoria de Promedio Real (derecha) por cuartiles de rendimiento (PC1).}
+    \label{fig:analisis_dual}
+\end{figure}
+
+\section{La Trampa del Perfeccionismo vs. el Pragmatismo}
+
+Uno de los hallazgos más significativos de este estudio es la interacción entre la regularidad y el promedio. Al segmentar a los estudiantes en el cuarto semestre (Tabla \ref{tab:supervivencia_perfiles}), se evidencia que la continuidad administrativa (Regularidad) es un predictor de éxito mucho más potente que la excelencia en la calificación (Promedio Natural).
+
+\input{tabla_supervivencia_perfiles}
+
+Este fenómeno sugiere que las estrategias de "sacrificio" de materias para preservar un promedio alto resultan contraproducentes en términos de eficiencia terminal, situando a los alumnos en trayectorias de rezago crónico similares a las de los estudiantes con bajo desempeño general.
