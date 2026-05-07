@@ -1,2 +1,83 @@
 \chapter*{Resumen}
-% Contenido del resumen aquí
+\addcontentsline{toc}{chapter}{Resumen}
+
+Esta investigación analiza las trayectorias académicas de estudiantes de las licenciaturas en
+Matemáticas y Física de la Facultad de Ciencias (UNAM) con el objetivo de caracterizar,
+explicar y predecir el rezago académico mediante métodos estadísticos multivariados y de
+aprendizaje automático. A partir del \emph{Vector Excalibur} —un conjunto de indicadores
+semestrales de regularidad gregoriana, índice de esfuerzo, promedio natural y promedio
+real— se construyó una arquitectura analítica de tres enfoques paralelos: exploratorio
+(PCA), inferencial (Análisis de Supervivencia) y predictivo (Random Forest y Regresión
+Regularizada).
+
+El análisis de componentes principales redujo el espacio de 32 variables a cinco componentes
+que explican el $88.5\,\%$ y $90.9\,\%$ de la varianza en Matemáticas y Física,
+respectivamente, revelando una gradación continua entre trayectorias eficientes y rezagadas
+que se manifiesta desde el segundo semestre. El análisis de supervivencia (Kaplan-Meier,
+Log-Rank y Cox) confirmó una diferencia estadísticamente significativa entre carreras
+($\chi^2 = 5.85$, $p = 0.016$) e identificó la \textbf{paradoja del perfeccionismo}: los
+estudiantes con alta regularidad y promedio modesto egresan sistemáticamente antes que los
+de alta calificación pero baja regularidad, con un \emph{Hazard Ratio} de la regularidad de
+$\text{HR} = 12.70$ ($p < 0.005$) frente a un efecto del promedio no significativo
+($p = 0.08$).
+
+Los modelos de clasificación Random Forest —validados mediante validación cruzada estratificada
+y bootstrapping ($B = 2{,}000$)— alcanzaron una exactitud del $65.5\,\%$
+(IC~95\,\%: $[64.1\,\%, 66.9\,\%]$) con información de los primeros cuatro semestres y del
+$78.2\,\%$ (IC~95\,\%: $[77.0\,\%, 79.4\,\%]$) con la trayectoria completa; la diferencia
+es estadísticamente significativa (McNemar: $\chi^2 = 827.70$,
+$p = 5.13 \times 10^{-182}$). La regresión regularizada Lasso sobre la submuestra sin censura
+($N = 3{,}157$; generaciones $\leq 2016$) explicó el $75.5\,\%$ de la varianza del semestre
+de egreso ($R^2 = 0.755$) con un Error Absoluto Medio de $0.957$ semestres, siendo la
+regularidad en el octavo semestre el predictor dominante en todos los modelos ($\beta = -2.445$,
+$t = -13.64$, $p < 10^{-40}$).
+
+Los resultados sugieren que la \textbf{inercia de inscripción continua} —y no la excelencia
+en la calificación— es el mecanismo estadístico dominante del egreso oportuno, con implicaciones
+directas para el diseño de sistemas de alerta estudiantil basados en regularidad en lugar de
+promedio.
+
+\bigskip
+\noindent\textbf{Palabras clave:} rezago académico, análisis de supervivencia, random forest,
+regresión regularizada, paradoja del perfeccionismo, inercia académica, alerta temprana.
+
+% ──────────────────────────────────────────────────────────────────────────────
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+This thesis analyzes the academic trajectories of undergraduate students in Mathematics and
+Physics at the Faculty of Sciences (UNAM) with the goal of characterizing, explaining, and
+predicting academic delay using multivariate statistical methods and machine learning. Drawing
+on the \emph{Vector Excalibur} —a set of semestral indicators covering enrollment regularity,
+effort index, natural GPA, and real GPA— a three-pronged analytical architecture was designed:
+exploratory (PCA), inferential (Survival Analysis), and predictive (Random Forest and
+Regularized Regression).
+
+Principal Component Analysis reduced the 32-variable space to five components explaining
+$88.5\,\%$ and $90.9\,\%$ of variance in Mathematics and Physics, respectively, revealing
+a continuous gradient between on-time and delayed trajectories visible as early as the second
+semester. Survival analysis (Kaplan-Meier, Log-Rank, and Cox) confirmed a statistically
+significant difference between programs ($\chi^2 = 5.85$, $p = 0.016$) and identified the
+\textbf{Perfectionist Paradox}: students with high enrollment regularity but modest grades
+graduate systematically earlier than those with high grades but low regularity, with a
+regularity Hazard Ratio of $\text{HR} = 12.70$ ($p < 0.005$) versus a non-significant
+effect of GPA ($p = 0.08$).
+
+Random Forest classifiers —validated via stratified cross-validation and bootstrapping
+($B = 2{,}000$)— reached $65.5\,\%$ accuracy (95\,\% CI: $[64.1\,\%, 66.9\,\%]$) using
+only the first four semesters, and $78.2\,\%$ (95\,\% CI: $[77.0\,\%, 79.4\,\%]$) with the
+full eight-semester trajectory; the gain is statistically significant (McNemar:
+$\chi^2 = 827.70$, $p = 5.13 \times 10^{-182}$). Lasso regression on the uncensored subsample
+($N = 3{,}157$; cohorts $\leq 2016$) explained $75.5\,\%$ of graduation-semester variance
+($R^2 = 0.755$) with a Mean Absolute Error of $0.957$ semesters, with eighth-semester
+enrollment regularity as the dominant predictor across all models ($\beta = -2.445$,
+$t = -13.64$, $p < 10^{-40}$).
+
+The findings suggest that \textbf{continuous enrollment inertia} —not academic excellence
+as measured by grades— is the statistically dominant mechanism of on-time graduation, with
+direct implications for student early-warning systems that should prioritize regularity over
+GPA as the primary risk signal.
+
+\bigskip
+\noindent\textbf{Keywords:} academic delay, survival analysis, random forest, regularized
+regression, perfectionist paradox, academic inertia, early warning system.

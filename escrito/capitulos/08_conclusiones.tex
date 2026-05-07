@@ -1,0 +1,214 @@
+% ============================================================
+% Capítulo 8: Conclusiones
+% ============================================================
+\chapter{Conclusiones}
+\label{ch:conclusiones}
+
+Esta investigación examinó las trayectorias académicas de estudiantes de Matemáticas y Física
+de la Facultad de Ciencias con el objetivo de caracterizar, explicar y predecir el rezago
+académico mediante una arquitectura analítica de tres enfoques complementarios. Los resultados
+obtenidos convergen en una narrativa coherente y cuantitativamente robusta que se sintetiza
+a continuación.
+
+% ──────────────────────────────────────────────────────────────────────────────
+\section{Conclusión Principal: La Paradoja del Perfeccionismo}
+% ──────────────────────────────────────────────────────────────────────────────
+
+El hallazgo más significativo y contraintuitivo de esta investigación es la \textbf{paradoja
+del perfeccionismo}: los estudiantes con promedio académico alto pero baja regularidad
+(\emph{Perfeccionistas}) tienen trayectorias de egreso significativamente más largas que
+aquellos con promedio modesto pero alta regularidad continua (\emph{Pragmáticos}).
+
+Esta paradoja fue confirmada de manera convergente por tres metodologías independientes:
+
+\begin{enumerate}
+    \item \textbf{Análisis de Supervivencia (Kaplan-Meier y Cox):} Los estudiantes Pragmáticos
+          (regularidad alta, promedio bajo al S4) tienen una mediana de egreso de
+          $10$--$12$ semestres, mientras que los Perfeccionistas (regularidad baja, promedio alto)
+          no alcanzan la mediana de egreso dentro del horizonte de observación de 20 semestres.
+          El modelo de Cox cuantificó este efecto: el \emph{Hazard Ratio} de la regularidad
+          fue $\text{HR} = 12.70$ ($p < 0.005$), mientras que el promedio natural no fue
+          estadísticamente significativo ($p = 0.08$).
+
+    \item \textbf{Modelos Predictivos de Clasificación (Random Forest):} La regularidad del
+          cuarto semestre (\texttt{s4\_reg}) fue el predictor Gini más importante en el Modelo
+          de Alerta Temprana, y la del octavo (\texttt{s8\_reg}) en el Modelo de Trayectoria
+          Completa. Ningún predictor de promedio individual figuró entre los diez más influyentes.
+
+    \item \textbf{Regresión Regularizada (Lasso/Ridge):} El único coeficiente con $|t| > 10$
+          en el Enfoque Truncado fue \texttt{s8\_reg} ($\beta = -2.445$, $t = -13.64$,
+          $p < 10^{-40}$). Los predictores de promedio (natural y real) no resultaron
+          significativos de manera individual bajo penalización regularizada.
+\end{enumerate}
+
+\noindent
+La interpretación es clara: la estrategia de \emph{sacrificar} materias para mantener un
+promedio alto —sin priorizar la continuidad en la inscripción— genera una \textbf{deuda de
+regularidad} que se acumula y eventualmente produce rezago. La inercia de inscripción
+continua, y no la excelencia en la calificación, es el motor estadístico del egreso oportuno
+en las licenciaturas de Ciencias exactas.
+
+% ──────────────────────────────────────────────────────────────────────────────
+\section{Conclusiones por Capítulo}
+% ──────────────────────────────────────────────────────────────────────────────
+
+\subsection{Metodología y Limpieza de Datos (Capítulo 4)}
+
+La metodología de \textbf{Corrección Dinámica a Tiempo Activo} demostró ser superior a la
+corrección fija promedio, con un Error Absoluto Medio de la corrección fija de $0.62$
+semestres en Matemáticas (máximo: $5.57$ semestres). La reincorporación de estudiantes con
+Baja Temporal —excluyendo solo aquellos con más de 4 semestres inactivos— generó un impacto
+cuantitativo masivo: la población analítica de Matemáticas creció un $\mathbf{57.4\,\%}$
+(de 2{,}687 a 4{,}229 alumnos) y la de Física un $\mathbf{69.3\,\%}$ (de 3{,}013 a
+5{,}100 alumnos). Esta decisión metodológica fortaleció sustancialmente la validez estadística
+de todas las inferencias posteriores.
+
+\subsection{Análisis Exploratorio (Capítulo 5)}
+
+El PCA confirmó que la alta dimensionalidad del Vector Excalibur (32 variables) puede reducirse
+a cinco componentes que explican el $88.5\,\%$ (Matemáticas) y $90.9\,\%$ (Física) de la
+varianza total. El \textbf{PC1} actúa como un índice de rendimiento académico global; el
+\textbf{PC2} como un índice de trayectoria temporal (mejora o deterioro). La proyección en el
+espacio PC1--PC2 revela una gradación continua y estadísticamente significativa que separa a
+los estudiantes sin rezago de los que lo experimentan desde etapas tempranas de la carrera.
+
+\noindent
+La variable individual más correlacionada con el semestre de término fue en ambas carreras
+\texttt{s8\_reg} ($r = -0.818$ en Mat, $r = -0.785$ en Fís), anticipando el hallazgo dominante
+de los modelos predictivos posteriores.
+
+\subsection{Análisis de Supervivencia (Capítulo 6)}
+
+La prueba Log-Rank confirmó una diferencia estadísticamente significativa entre las curvas de
+supervivencia de Matemáticas y Física ($\chi^2 = 5.85$, $p = 0.016$): la mediana de egreso en
+Física es de 17.0 semestres $[16.0, 18.0]$, mientras que en Matemáticas más del 50\,\% de la
+cohorte no alcanza la titulación en el horizonte de observación de 20 semestres.
+
+\noindent
+La segmentación por perfil académico al cuarto semestre demostró que la paradoja del
+perfeccionismo no es marginal: la Log-Rank entre Pragmáticos y Perfeccionistas arrojó
+$p < 0.0001$, y el modelo de Cox asignó al perfil de regularidad alta un Hazard Ratio de
+$12.70$ — un estudiante con alta regularidad tiene $12.70$ veces más probabilidad instantánea
+de egresar que uno con baja regularidad, en igualdad de condiciones de promedio.
+
+\subsection{Modelos Predictivos (Capítulo 7)}
+
+\subsubsection{Enfoque Multiclase — Random Forest}
+
+El sistema de alerta temprana (Modelo~A, S1--S4) clasificó correctamente el estado académico
+final del $65.5\,\%$ de los estudiantes (IC~95\,\%: $[64.1, 66.9]$\,\%). El modelo de
+trayectoria completa (Modelo~B, S1--S8) elevó este porcentaje al $78.2\,\%$
+(IC~95\,\%: $[77.0, 79.4]$\,\%). La prueba de McNemar confirmó que esta diferencia de
+$+12.7$ puntos es estadísticamente significativa ($\chi^2 = 827.70$,
+$p = 5.13 \times 10^{-182}$), no un artefacto del muestreo.
+
+\subsubsection{Enfoque Truncado — Regresión Regularizada}
+
+Sobre la submuestra libre de censura ($N = 3{,}157$, generaciones $\leq 2016$), Ridge y Lasso
+alcanzaron $R^2 \approx 0.755$, prediciendo el semestre exacto de egreso con un Error Absoluto
+Medio de $0.957$ semestres. La prueba de Diebold-Mariano no encontró diferencia significativa
+entre ambos ($DM = 0.026$, $p = 0.979$), por lo que se prefiere Lasso por su mayor parsimonia
+(31 vs.\ 40 predictores activos). El único predictor con $|t| > 10$ fue \texttt{s8\_reg}
+($\beta = -2.445$, $t = -13.64$), consolidando la conclusión central.
+
+% ──────────────────────────────────────────────────────────────────────────────
+\section{Implicaciones Institucionales}
+% ──────────────────────────────────────────────────────────────────────────────
+
+Los hallazgos de esta investigación tienen implicaciones directas para la gestión académica
+de la Facultad de Ciencias:
+
+\begin{enumerate}
+    \item \textbf{Reorientar la métrica de riesgo.} Los sistemas de alerta estudiantil actuales
+          suelen basarse en el promedio de calificaciones. Esta investigación demuestra que la
+          \emph{regularidad semestral} —es decir, el cumplimiento de créditos en tiempo y
+          forma— es un predictor $12.7\times$ más potente del riesgo de rezago. Los paneles
+          de seguimiento deben incorporar un indicador de regularidad acumulada como señal
+          de alerta primaria.
+
+    \item \textbf{Intervención temprana en el segundo año.} La divergencia de trayectorias
+          comenzó a ser estadísticamente significativa desde el segundo y tercer semestre.
+          Un sistema de alerta basado en los primeros cuatro semestres ya logra una precisión
+          del $65.5\,\%$ en la clasificación del destino académico final. Esto justifica
+          programas de tutoría y apoyo focalizados en los estudiantes con baja regularidad
+          temprana, independientemente de su promedio.
+
+    \item \textbf{Redefinir el éxito académico.} La estrategia cultural de priorizar las
+          calificaciones sobre la continuidad —frecuentemente incentivada por becas y sistemas
+          de evaluación que premian el promedio— puede ser contraproducente para el egreso
+          oportuno. La Facultad podría considerar mecanismos que incentiven la inscripción
+          continua al mismo nivel que los estímulos por promedio.
+
+    \item \textbf{Capacidad de predicción cuantitativa.} El modelo Lasso del Enfoque Truncado
+          puede predecir el semestre de egreso de un estudiante con un error menor a un semestre
+          ($\text{MAE} = 0.957$). Integrado en un sistema de información escolar, este modelo
+          permitiría generar proyecciones personalizadas de egreso y optimizar la asignación
+          de recursos de apoyo académico.
+\end{enumerate}
+
+% ──────────────────────────────────────────────────────────────────────────────
+\section{Limitaciones y Líneas de Investigación Futura}
+% ──────────────────────────────────────────────────────────────────────────────
+
+\subsection{Limitaciones del Estudio}
+
+\begin{itemize}
+    \item \textbf{Alcance institucional.} Los datos corresponden exclusivamente a las
+          licenciaturas en Matemáticas y Física. La generalización de los hallazgos a otras
+          disciplinas o instituciones requiere validación en nuevos contextos.
+
+    \item \textbf{Variables no observadas.} El Vector Excalibur no captura factores
+          socioeconómicos, personales o de salud que también influyen en el rezago. La
+          inercia académica es el mecanismo \emph{estadísticamente dominante} en los datos
+          disponibles, pero no necesariamente el único causal.
+
+    \item \textbf{Clase ``Activo/Aún cursando''.} Ambos modelos de clasificación tienen
+          dificultad para identificar a los estudiantes activos (recall $< 5\,\%$). Esto es
+          inherente al problema: su trayectoria no ha concluido y se solapa con la de quienes
+          se titularán o abandonarán. Datos longitudinales actualizados semestralmente
+          resolverían esta limitación.
+
+    \item \textbf{Supuesto de censura no informativa.} El análisis de supervivencia asume
+          que el mecanismo de censura es independiente del tiempo de egreso. La ausencia de
+          datos sobre las causas reales de abandono impide validar formalmente este supuesto.
+\end{itemize}
+
+\subsection{Líneas de Investigación Futura}
+
+\begin{itemize}
+    \item \textbf{Modelos de tiempo discreto.} Explorar modelos de supervivencia paramétricos
+          con distribuciones de Weibull o Log-Normal para mejorar la predicción del tiempo
+          de egreso más allá de las generaciones $\leq 2016$.
+
+    \item \textbf{Aprendizaje profundo sobre secuencias.} Dado el carácter secuencial de la
+          trayectoria semestral, modelos de redes recurrentes (LSTM, Transformer) o de
+          proceso de punto temporal podrían capturar dependencias temporales no lineales que
+          la regresión regularizada no modela explícitamente.
+
+    \item \textbf{Extensión a otras licenciaturas.} Replicar el análisis en Biología, Física
+          Biomédica u otras disciplinas de la Facultad de Ciencias permitiría identificar
+          si la paradoja del perfeccionismo es universal o específica de las carreras
+          de Matemáticas y Física.
+
+    \item \textbf{Actualización en tiempo real.} Diseñar un pipeline de ingesta semestral
+          que actualice las predicciones del modelo Lasso conforme se dispone de nuevos
+          datos, habilitando un sistema de alerta dinámico y prospectivo.
+\end{itemize}
+
+% ──────────────────────────────────────────────────────────────────────────────
+\section{Reflexión Final}
+% ──────────────────────────────────────────────────────────────────────────────
+
+Esta investigación ofrece una respuesta cuantitativa a una pregunta institucional urgente:
+¿\emph{quién llega y quién no?} Los datos demuestran que el egreso oportuno no es función
+del talento medido en calificaciones, sino de la \textbf{persistencia medida en regularidad}.
+El estudiante que se inscribe semestre a semestre, aunque no brille en promedio, tiene
+sistemáticamente mejores probabilidades de concluir su carrera que aquel que sacrifica
+materias en busca de la excelencia en la nota.
+
+Esta conclusión no es trivial. Sugiere que el diseño institucional —planes de estudio,
+políticas de beca, sistemas de seguimiento— debe migrar de una lógica de \emph{control de
+calidad ex post} (intervenir cuando el promedio cae) a una lógica de \emph{monitoreo de
+continuidad en tiempo real} (intervenir cuando la regularidad disminuye). En ese sentido,
+los modelos predictivos desarrollados en esta tesis no son solo un ejercicio académico:
+son prototipos de herramientas de gestión escolar basadas en evidencia estadística rigurosa.

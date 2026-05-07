@@ -1,0 +1,295 @@
+{
+  "modelo_A": {
+    "label": "A (Alerta Temprana)",
+    "n_semestres": 4,
+    "n_obs": 4853,
+    "classes": [
+      "Abandono silencioso",
+      "Activo / Aún cursando",
+      "Titulado a tiempo",
+      "Titulado con rezago"
+    ],
+    "features": [
+      "s1_reg",
+      "s1_esf",
+      "s1_nat",
+      "s1_real",
+      "s1_esf_x_real",
+      "s2_reg",
+      "s2_esf",
+      "s2_nat",
+      "s2_real",
+      "s2_esf_x_real",
+      "s3_reg",
+      "s3_esf",
+      "s3_nat",
+      "s3_real",
+      "s3_esf_x_real",
+      "s4_reg",
+      "s4_esf",
+      "s4_nat",
+      "s4_real",
+      "s4_esf_x_real"
+    ],
+    "importances": {
+      "s1_reg": 0.036193975365342725,
+      "s1_esf": 0.014761770781214639,
+      "s1_nat": 0.029668951283627284,
+      "s1_real": 0.03514565333290681,
+      "s1_esf_x_real": 0.03469200248608842,
+      "s2_reg": 0.043849062601736044,
+      "s2_esf": 0.0196555718854953,
+      "s2_nat": 0.03458781109744527,
+      "s2_real": 0.04787558435095968,
+      "s2_esf_x_real": 0.046206404255779876,
+      "s3_reg": 0.08063462222485888,
+      "s3_esf": 0.025173255538359893,
+      "s3_nat": 0.039422683780808786,
+      "s3_real": 0.06428181037567485,
+      "s3_esf_x_real": 0.06109525139085292,
+      "s4_reg": 0.1262885095698387,
+      "s4_esf": 0.035643441577881095,
+      "s4_nat": 0.046071816722660995,
+      "s4_real": 0.09454584741579034,
+      "s4_esf_x_real": 0.08420597396267739
+    },
+    "confusion_matrix": [
+      [
+        732,
+        32,
+        58,
+        302
+      ],
+      [
+        169,
+        10,
+        16,
+        58
+      ],
+      [
+        21,
+        1,
+        1499,
+        352
+      ],
+      [
+        324,
+        6,
+        335,
+        938
+      ]
+    ],
+    "bootstrap": {
+      "accuracy_mean": 0.6548991345559447,
+      "accuracy_ci_lo": 0.6412528332989903,
+      "accuracy_ci_hi": 0.66886461982279,
+      "f1_macro_mean": 0.5130992787238657,
+      "f1_macro_ci_lo": 0.4990000030876912,
+      "f1_macro_ci_hi": 0.5279621481664676
+    },
+    "bootstrap_per_class": {
+      "Abandono silencioso": {
+        "precision_mean": 0.5872490329748137,
+        "precision_ci_lo": 0.5596475382920716,
+        "precision_ci_hi": 0.6154504629770721,
+        "recall_mean": 0.6514595225158794,
+        "recall_ci_lo": 0.6235893668534523,
+        "recall_ci_hi": 0.6801446662295718
+      },
+      "Activo / Aún cursando": {
+        "precision_mean": 0.20417306910225563,
+        "precision_ci_lo": 0.09802725968436155,
+        "precision_ci_hi": 0.324355751099937,
+        "recall_mean": 0.03919629965724857,
+        "recall_ci_lo": 0.017181761868943855,
+        "recall_ci_hi": 0.06439699413489734
+      },
+      "Titulado a tiempo": {
+        "precision_mean": 0.7854528508044496,
+        "precision_ci_lo": 0.7670333718082308,
+        "precision_ci_hi": 0.8028825895859113,
+        "recall_mean": 0.8000780642135125,
+        "recall_ci_lo": 0.781930352743566,
+        "recall_ci_hi": 0.8177794249239573
+      },
+      "Titulado con rezago": {
+        "precision_mean": 0.5683807738207807,
+        "precision_ci_lo": 0.5439785220271778,
+        "precision_ci_hi": 0.5930369809825586,
+        "recall_mean": 0.5851882914334267,
+        "recall_ci_lo": 0.5594541620599259,
+        "recall_ci_hi": 0.609635537420013
+      }
+    }
+  },
+  "modelo_B": {
+    "label": "B (Trayectoria Completa)",
+    "n_semestres": 8,
+    "n_obs": 4276,
+    "classes": [
+      "Abandono silencioso",
+      "Activo / Aún cursando",
+      "Titulado a tiempo",
+      "Titulado con rezago"
+    ],
+    "features": [
+      "s1_reg",
+      "s1_esf",
+      "s1_nat",
+      "s1_real",
+      "s1_esf_x_real",
+      "s2_reg",
+      "s2_esf",
+      "s2_nat",
+      "s2_real",
+      "s2_esf_x_real",
+      "s3_reg",
+      "s3_esf",
+      "s3_nat",
+      "s3_real",
+      "s3_esf_x_real",
+      "s4_reg",
+      "s4_esf",
+      "s4_nat",
+      "s4_real",
+      "s4_esf_x_real",
+      "s5_reg",
+      "s5_esf",
+      "s5_nat",
+      "s5_real",
+      "s5_esf_x_real",
+      "s6_reg",
+      "s6_esf",
+      "s6_nat",
+      "s6_real",
+      "s6_esf_x_real",
+      "s7_reg",
+      "s7_esf",
+      "s7_nat",
+      "s7_real",
+      "s7_esf_x_real",
+      "s8_reg",
+      "s8_esf",
+      "s8_nat",
+      "s8_real",
+      "s8_esf_x_real"
+    ],
+    "importances": {
+      "s1_reg": 0.009393891126584371,
+      "s1_esf": 0.005877726067169069,
+      "s1_nat": 0.009816606563140472,
+      "s1_real": 0.01211913733852094,
+      "s1_esf_x_real": 0.011760469399243637,
+      "s2_reg": 0.011416762354869143,
+      "s2_esf": 0.0070549503296826405,
+      "s2_nat": 0.012590508823981475,
+      "s2_real": 0.01468473071606459,
+      "s2_esf_x_real": 0.012927575834069081,
+      "s3_reg": 0.015108573926319282,
+      "s3_esf": 0.008522696308731056,
+      "s3_nat": 0.01294363693708592,
+      "s3_real": 0.015413342302684593,
+      "s3_esf_x_real": 0.015448362641671811,
+      "s4_reg": 0.021573071576194397,
+      "s4_esf": 0.00722551571636535,
+      "s4_nat": 0.014332297113991836,
+      "s4_real": 0.021292589219337035,
+      "s4_esf_x_real": 0.016223070784921446,
+      "s5_reg": 0.04410649213481879,
+      "s5_esf": 0.01002993976028464,
+      "s5_nat": 0.01330680027065625,
+      "s5_real": 0.0271403065737535,
+      "s5_esf_x_real": 0.02513730464852068,
+      "s6_reg": 0.06873221094813893,
+      "s6_esf": 0.008366128179186822,
+      "s6_nat": 0.015340475393213543,
+      "s6_real": 0.028477848437473995,
+      "s6_esf_x_real": 0.02107055890862799,
+      "s7_reg": 0.08923942297052988,
+      "s7_esf": 0.013586814282804947,
+      "s7_nat": 0.01521704367270357,
+      "s7_real": 0.04099449198098541,
+      "s7_esf_x_real": 0.032779323171671496,
+      "s8_reg": 0.12957276257804917,
+      "s8_esf": 0.02223588310384503,
+      "s8_nat": 0.015154763506874837,
+      "s8_real": 0.059098767044416405,
+      "s8_esf_x_real": 0.06468714735281585
+    },
+    "confusion_matrix": [
+      [
+        544,
+        18,
+        7,
+        195
+      ],
+      [
+        135,
+        4,
+        1,
+        46
+      ],
+      [
+        0,
+        0,
+        1589,
+        168
+      ],
+      [
+        194,
+        2,
+        167,
+        1206
+      ]
+    ],
+    "bootstrap": {
+      "accuracy_mean": 0.7816997193638915,
+      "accuracy_ci_lo": 0.769644527595884,
+      "accuracy_ci_hi": 0.7944340505144996,
+      "f1_macro_mean": 0.5906096467820368,
+      "f1_macro_ci_lo": 0.5779228551283707,
+      "f1_macro_ci_hi": 0.6042501164383924
+    },
+    "bootstrap_per_class": {
+      "Abandono silencioso": {
+        "precision_mean": 0.6225563933381522,
+        "precision_ci_lo": 0.5911651567944252,
+        "precision_ci_hi": 0.6541532603629475,
+        "recall_mean": 0.7118388764716911,
+        "recall_ci_lo": 0.6807939340278092,
+        "recall_ci_hi": 0.7434269815894877
+      },
+      "Activo / Aún cursando": {
+        "precision_mean": 0.16850751555730686,
+        "precision_ci_lo": 0.03125,
+        "precision_ci_hi": 0.3333333333333333,
+        "recall_mean": 0.021750810684253694,
+        "recall_ci_lo": 0.004694835680751174,
+        "recall_ci_hi": 0.0447803119235284
+      },
+      "Titulado a tiempo": {
+        "precision_mean": 0.9006805893733493,
+        "precision_ci_lo": 0.8863356360091434,
+        "precision_ci_hi": 0.9142536813480877,
+        "recall_mean": 0.9044431830014653,
+        "recall_ci_lo": 0.8903726281397388,
+        "recall_ci_hi": 0.91837899543379
+      },
+      "Titulado con rezago": {
+        "precision_mean": 0.7468253421037364,
+        "precision_ci_lo": 0.7262062787537678,
+        "precision_ci_hi": 0.7682636719325936,
+        "recall_mean": 0.7685633591500418,
+        "recall_ci_lo": 0.747780412054273,
+        "recall_ci_hi": 0.7883668556371767
+      }
+    }
+  },
+  "mcnemar": {
+    "b": 1815,
+    "c": 446,
+    "statistic": 827.6974789915967,
+    "p_value": 5.131652187479651e-182,
+    "decision": "Rechazar H0 (p < 0.05): Los modelos difieren significativamente."
+  }
+}

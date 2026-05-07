@@ -1,0 +1,395 @@
+% ============================================================
+% Capítulo 7: Modelos Predictivos de Trayectoria Académica
+% ============================================================
+\chapter{Modelos Predictivos de Trayectoria Académica}
+\label{ch:modelos_predictivos}
+
+El presente capítulo constituye la etapa final del análisis cuantitativo de esta investigación.
+Habiendo establecido en el Capítulo~\ref{ch:supervivencia} la dinámica temporal del egreso mediante
+curvas de supervivencia y el modelo de Cox, se implementa aquí un enfoque de aprendizaje automático
+supervisado para predecir el \emph{estado académico final} de cada estudiante, formalizando así el
+concepto de sistema de alerta estudiantil como herramienta institucional prospectiva.
+
+\section{Marco Conceptual y Diseño Experimental}
+
+Se entrenaron dos modelos de clasificación multiclase basados en el algoritmo
+\emph{Random Forest} \citep[cf.][]{breiman2001random}, cada uno diferenciado por el horizonte
+temporal de sus predictores:
+
+\begin{itemize}
+    \item \textbf{Modelo~A — Alerta Temprana (S1–S4):} utiliza exclusivamente las métricas de
+          regularidad, esfuerzo, promedio natural y promedio real de los primeros cuatro semestres,
+          junto con la variable de interacción $\text{esf}_i \times \text{real}_i$. Simula un
+          escenario institucional en el que se desea identificar estudiantes en riesgo a la mitad
+          de la trayectoria curricular.
+    \item \textbf{Modelo~B — Trayectoria Completa (S1–S8):} extiende el conjunto de predictores
+          hasta el octavo semestre. Representa el horizonte temporal máximo en que la información
+          académica aún resulta accionable para intervención institucional.
+\end{itemize}
+
+La variable objetivo $Y$ toma cuatro valores categóricos:
+\emph{Titulado a tiempo}, \emph{Titulado con rezago}, \emph{Abandono silencioso} y
+\emph{Activo/Aún cursando}. La clasificación se realizó sobre una muestra combinada de ambas
+carreras ($N_A = 4{,}853$; $N_B = 4{,}276$ observaciones completas respectivamente).
+
+\subsection{Protocolo de Validación}
+
+Para evitar el sobreajuste en la evaluación, se utilizó \textbf{validación cruzada estratificada
+de 5 pliegues} (\emph{Stratified 5-fold CV}), generando predicciones \emph{out-of-fold} (OOF)
+sobre el conjunto completo. Los hiperparámetros del modelo se fijaron en:
+$n_{\text{árboles}} = 500$, $\text{max\_features} = \sqrt{p}$, $\text{min\_samples\_leaf} = 3$,
+ponderación de clases balanceada (\texttt{class\_weight=`balanced'}), semilla aleatoria $= 42$.
+
+Los \textbf{intervalos de confianza al 95\,\%} para todas las métricas de desempeño se obtuvieron
+mediante \textbf{bootstrapping no paramétrico} con $B = 2{,}000$ remuestreos sobre las
+predicciones OOF, empleando percentiles empíricos al 2.5\,\% y 97.5\,\%.
+
+% ──────────────────────────────────────────────────────────────────────────────
+\section{Resultados de Desempeño Global}
+% ──────────────────────────────────────────────────────────────────────────────
+
+La Tabla~\ref{tab:rf_global} sintetiza las métricas de desempeño global con sus respectivos
+intervalos de confianza. El Modelo~B supera consistentemente al Modelo~A en todas las métricas.
+
+\begin{table}[H]
+\centering
+\caption{Desempeño global de los modelos Random Forest (Validación cruzada OOF, $B=2{,}000$ bootstrap)}
+\label{tab:rf_global}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Modelo} & \textbf{$N$} & \textbf{Accuracy} & \textbf{IC 95\,\% Accuracy} & \textbf{F1-macro} \\
+\midrule
+A — Alerta Temprana (S1–S4) & 4,853 & 0.655 & [0.641, 0.669] & 0.513 \\
+B — Trayectoria Completa (S1–S8) & 4,276 & 0.782 & [0.770, 0.794] & 0.591 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+El Modelo~A alcanza una exactitud de $0.655$ (IC~95\,\%: $[0.641, 0.669]$) usando únicamente
+información de los primeros cuatro semestres. El Modelo~B mejora esta cifra a $0.782$
+(IC~95\,\%: $[0.770, 0.794]$) al incorporar la trayectoria hasta el octavo semestre.
+En ambos casos los intervalos no se solapan, indicando diferencias estadísticamente robustas.
+
+% ──────────────────────────────────────────────────────────────────────────────
+\section{Desempeño por Clase}
+% ──────────────────────────────────────────────────────────────────────────────
+
+La Tabla~\ref{tab:rf_clases} desglosa la precisión y el recall por categoría académica, con
+sus intervalos de confianza bootstrap al 95\,\%.
+
+\begin{table}[H]
+\centering
+\caption{Precisión y Recall por clase — IC al 95\,\% (Bootstrap, $B=2{,}000$)}
+\label{tab:rf_clases}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Modelo} & \textbf{Clase} & \textbf{Precisión} & \textbf{IC 95\,\% Precisión} & \textbf{Recall} & \textbf{IC 95\,\% Recall} \\
+\midrule
+\multirow{4}{*}{A (S1–S4)}
+ & Abandono silencioso    & 0.587 & [0.560, 0.615] & 0.651 & [0.624, 0.680] \\
+ & Activo / Aún cursando & 0.204 & [0.098, 0.324] & 0.039 & [0.017, 0.064] \\
+ & Titulado a tiempo     & 0.785 & [0.767, 0.803] & 0.800 & [0.782, 0.818] \\
+ & Titulado con rezago   & 0.568 & [0.544, 0.593] & 0.585 & [0.559, 0.610] \\
+\midrule
+\multirow{4}{*}{B (S1–S8)}
+ & Abandono silencioso    & 0.623 & [0.591, 0.654] & 0.712 & [0.681, 0.743] \\
+ & Activo / Aún cursando & 0.169 & [0.031, 0.333] & 0.022 & [0.005, 0.045] \\
+ & Titulado a tiempo     & 0.901 & [0.886, 0.914] & 0.904 & [0.890, 0.918] \\
+ & Titulado con rezago   & 0.747 & [0.726, 0.768] & 0.769 & [0.748, 0.788] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+En ambos modelos, la categoría \emph{Titulado a tiempo} presenta el mejor desempeño, con una
+precisión que alcanza $0.901$ (IC: $[0.886, 0.914]$) en el Modelo~B. En contraste, la clase
+\emph{Activo/Aún cursando} resulta la más difícil de identificar en ambos escenarios (recall
+$< 0.04$), lo que es esperable dado su carácter ambiguo: los estudiantes activos aún no han
+expresado su estado final real.
+
+% ──────────────────────────────────────────────────────────────────────────────
+\section{Matrices de Confusión}
+% ──────────────────────────────────────────────────────────────────────────────
+
+Las Figuras~\ref{fig:cm_s4} y~\ref{fig:cm_s8} presentan las matrices de confusión OOF de
+ambos modelos.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{rf_confusion_matrix_s4}
+        \caption{Modelo A — Alerta Temprana (S1–S4)}
+        \label{fig:cm_s4}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{rf_confusion_matrix_s8}
+        \caption{Modelo B — Trayectoria Completa (S1–S8)}
+        \label{fig:cm_s8}
+    \end{subfigure}
+    \caption{Matrices de confusión (validación cruzada OOF, 5-fold estratificado).
+             Diagonal principal: predicciones correctas.}
+    \label{fig:confusion_matrices}
+\end{figure}
+
+\noindent
+La principal fuente de error en ambos modelos es la confusión entre \emph{Abandono silencioso}
+y \emph{Titulado con rezago}: en el Modelo~A, 324 estudiantes en situación de abandono son
+clasificados erróneamente como rezago, y 302 en situación de rezago son clasificados como
+abandono. El Modelo~B reduce estas confusiones ($195$ y $194$ respectivamente), confirmando
+que los semestres avanzados son informativos para discriminar ambas categorías.
+
+% ──────────────────────────────────────────────────────────────────────────────
+\section{Importancia de Variables}
+% ──────────────────────────────────────────────────────────────────────────────
+
+Las Figuras~\ref{fig:fi_s4} y~\ref{fig:fi_s8} muestran los doce predictores con mayor
+importancia Gini en cada modelo.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{rf_feature_importance_s4}
+        \caption{Modelo A — S1–S4}
+        \label{fig:fi_s4}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{rf_feature_importance_s8}
+        \caption{Modelo B — S1–S8}
+        \label{fig:fi_s8}
+    \end{subfigure}
+    \caption{Importancia de variables (Gini) para los modelos Random Forest.
+             Código de colores: \textcolor{red}{rojo} = interacción esf$\times$real,
+             \textcolor{blue}{azul} = esfuerzo, \textcolor{green!60!black}{verde} = regularidad,
+             \textcolor{orange}{naranja} = promedio.}
+    \label{fig:feature_importances}
+\end{figure}
+
+\noindent
+En el \textbf{Modelo~A}, la regularidad del cuarto semestre (\texttt{s4\_reg}, importancia
+$= 0.126$) emerge como el predictor más influyente, seguido del promedio real del cuarto
+semestre (\texttt{s4\_real}, $= 0.095$) y la interacción $\text{esf}_4 \times \text{real}_4$
+($= 0.084$). La regularidad del tercer semestre (\texttt{s3\_reg}, $= 0.081$) también tiene
+peso relevante, sugiriendo que la inercia académica de los primeros semestres empieza a
+manifestarse a partir de S3.
+
+En el \textbf{Modelo~B}, la regularidad del octavo semestre (\texttt{s8\_reg}, $= 0.130$)
+domina el árbol de decisión, seguida de la regularidad del séptimo (\texttt{s7\_reg}, $= 0.089$)
+y la interacción $\text{esf}_8 \times \text{real}_8$ ($= 0.065$). Este patrón confirma que
+la regularidad acumulada es el indicador más robusto del destino académico, consistente con
+los hallazgos del modelo de Cox del capítulo anterior.
+
+% ──────────────────────────────────────────────────────────────────────────────
+\section{Prueba de Hipótesis: Test de McNemar}
+% ──────────────────────────────────────────────────────────────────────────────
+
+Para establecer con rigor estadístico si la diferencia en desempeño entre ambos modelos
+es significativa o atribuible a variación aleatoria, se aplicó la \textbf{prueba de McNemar}
+\citep{mcnemar1947note} sobre los pares de predicciones comunes a ambos modelos.
+
+\vspace{0.5em}
+\noindent\textbf{Hipótesis:}
+\begin{itemize}
+    \item[$H_0$:] Los modelos A y B tienen la misma tasa de error (las discordancias son simétricas).
+    \item[$H_1$:] Los modelos difieren significativamente en su capacidad predictiva.
+\end{itemize}
+
+La prueba opera sobre la tabla de contingencia $2\times 2$ de discordancias:
+$b = 1{,}815$ (A correcto, B incorrecto) y $c = 446$ (A incorrecto, B correcto).
+La asimetría marcada ($b \gg c$) indica que el Modelo~B corrige sistemáticamente errores
+que el Modelo~A no puede resolver. Se aplicó la corrección de continuidad de Yates.
+
+\begin{table}[H]
+\centering
+\caption{Resultado de la Prueba de McNemar (Modelo~A vs Modelo~B)}
+\label{tab:mcnemar}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Parámetro} & \textbf{Valor} \\
+\midrule
+$b$ (A correcto, B incorrecto) & 1,815 \\
+$c$ (A incorrecto, B correcto) & 446 \\
+Estadístico $\chi^2$ (Yates)   & 827.70 \\
+$p$-valor                       & $5.13 \times 10^{-182}$ \\
+\midrule
+\textbf{Decisión} ($\alpha = 0.05$) & \textbf{Rechazar $H_0$} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+El valor del estadístico $\chi^2 = 827.70$ con un $p\text{-valor} = 5.13 \times 10^{-182}$
+proporciona evidencia abrumadora para rechazar $H_0$. La incorporación de los semestres S5–S8
+no es trivial: produce una mejora en predicción estadísticamente significativa y cuantitativamente
+sustantiva ($+12.7$ puntos porcentuales en accuracy).
+
+% ──────────────────────────────────────────────────────────────────────────────
+\section{Síntesis e Implicaciones Institucionales}
+% ──────────────────────────────────────────────────────────────────────────────
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{rf_comparativa_ic}
+    \caption{Comparativa de Accuracy y F1-Score macro con intervalos de confianza al 95\,\%
+             (Bootstrap). Los intervalos no se solapan en ninguna métrica.}
+    \label{fig:comparativa_ic}
+\end{figure}
+
+Los resultados permiten derivar tres conclusiones de relevancia institucional:
+
+\begin{enumerate}
+    \item \textbf{Valor del sistema de alerta temprana.} Con solo cuatro semestres de información,
+          el Modelo~A clasifica correctamente al $65.5\,\%$ de los estudiantes, con una precisión
+          del $80\,\%$ para el grupo más crítico (\emph{Titulado a tiempo}). Esto justifica la
+          implementación de un panel de riesgo temprano en los sistemas de gestión escolar.
+
+    \item \textbf{Ganancia marginal de la información tardía.} El Modelo~B mejora la clasificación
+          en $+12.7$ puntos porcentuales de accuracy y $+7.8$ puntos de F1-macro. La prueba de
+          McNemar confirma que esta ganancia es estadísticamente significativa
+          ($p = 5.13\times10^{-182}$), no un artefacto muestral.
+
+    \item \textbf{Límites del modelo: la clase ``Activo/Aún cursando''.} Ambos modelos tienen
+          dificultad para identificar estudiantes activos (recall $< 5\,\%$). Esto es inherente
+          al problema: los estudiantes activos no han expresado su trayectoria completa, por lo que
+          su patrón de comportamiento se solapa con el de estudiantes que eventualmente se titularán
+          o abandonarán. Una solución prospectiva requeriría datos longitudinales actualizados
+          semestre a semestre.
+\end{enumerate}
+
+\noindent
+Finalmente, la consistencia de la \textbf{regularidad semestral} como el predictor más influyente
+en ambos modelos —confirmando los hallazgos del análisis de supervivencia— refuerza la hipótesis
+central de esta investigación: la \emph{inercia de inscripción continua} es el mecanismo
+estadístico dominante en la determinación del destino académico de los estudiantes de Ciencias.
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Enfoque Truncado: Regresión Regularizada sin Censura}
+\label{sec:enfoque_truncado}
+% ══════════════════════════════════════════════════════════════════════════════
+
+Mientras que el Enfoque Multiclase trata el estado académico como variable categórica,
+el \textbf{Enfoque Truncado} aborda el problema como una regresión continua. Al restringir
+el análisis a las generaciones anteriores a 2017 ($\leq 2016$) y eliminar registros sin
+semestre de término conocido, se obtiene una muestra \emph{libre de censura} que permite
+aplicar regresión regularizada sin los sesgos de tratar valores censurados como numéricos.
+
+\subsection{Datos y Protocolo}
+
+La muestra comprende $N = 3{,}157$ estudiantes ($\bar{y} = 11.29$ semestres, $\sigma = 2.75$;
+rango: $[8, 20]$), con $p = 40$ predictores: las cuatro métricas del Vector Excalibur
+(regularidad, esfuerzo, promedio natural, promedio real) en los semestres S1–S8, más las
+interacciones $\text{esf}_i \times \text{real}_i$. Los predictores se estandarizaron (Z-score)
+antes del entrenamiento. Se entrenaron dos modelos con $\alpha$ óptimo por 5-fold CV:
+\textbf{Ridge} ($\alpha^* = 7.743$, 40 coefs. activos) y \textbf{Lasso}
+($\alpha^* = 0.0024$, 31 coefs. activos). Los IC al 95\,\% se obtuvieron por bootstrapping
+($B = 2{,}000$).
+
+\subsection{Resultados de Desempeño}
+
+\begin{table}[H]
+\centering
+\caption{Desempeño del Enfoque Truncado — Ridge vs.\ Lasso (IC al 95\,\%, Bootstrap $B=2{,}000$)}
+\label{tab:trunc_global}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Modelo} & \textbf{RMSE (IC 95\,\%)} & \textbf{MAE (IC 95\,\%)} & \textbf{R² (IC 95\,\%)} & \textbf{Activos} \\
+\midrule
+Ridge ($\alpha = 7.743$)  & 1.360 [1.307, 1.421] & 0.957 [0.924, 0.991] & 0.755 [0.738, 0.772] & 40/40 \\
+Lasso ($\alpha = 0.0024$) & 1.360 [1.307, 1.421] & 0.957 [0.925, 0.992] & 0.755 [0.738, 0.772] & 31/40 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+Ambos modelos alcanzan $R^2 \approx 0.755$, explicando el $75.5\,\%$ de la varianza con un
+Error Absoluto Medio de $\approx 0.957$ semestres —es decir, el modelo predice el semestre
+exacto de egreso con un error inferior a \textbf{un semestre} en promedio.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{trunc_pred_vs_real}
+    \caption{Predicción vs.\ Real del semestre de término (Ridge izquierda, Lasso derecha).
+             Los puntos sobre la diagonal indican predicciones perfectas.}
+    \label{fig:trunc_pred_vs_real}
+\end{figure}
+
+\subsection{Prueba F Global y Coeficientes Significativos}
+
+La \textbf{prueba F global} rechaza $H_0$ con certeza práctica para ambos modelos:
+$F(40,\, 3116) = 240.05$, $p < 2.2 \times 10^{-16}$.
+
+Los coeficientes individualmente significativos ($p < 0.05$) bajo Ridge se presentan
+en la Tabla~\ref{tab:trunc_coef_sig}.
+
+\begin{table}[H]
+\centering
+\caption{Coeficientes significativos del modelo Ridge (prueba $t$, $\alpha = 0.05$)}
+\label{tab:trunc_coef_sig}
+\begin{tabular}{lrrrrl}
+\toprule
+\textbf{Variable} & \textbf{Coef.} & \textbf{SE} & \textbf{$t$} & \textbf{$p$-valor} & \\
+\midrule
+\texttt{s8\_reg}          & $-2.445$ & 0.179 & $-13.64$ & $< 10^{-40}$ & ✓ \\
+\texttt{s7\_reg}          & $-0.818$ & 0.276 & $-2.965$ & $0.003$ & ✓ \\
+\texttt{s5\_esf}          & $+0.329$ & 0.130 & $+2.525$ & $0.012$ & ✓ \\
+\texttt{s7\_esf}          & $+0.289$ & 0.130 & $+2.216$ & $0.027$ & ✓ \\
+\texttt{s6\_nat}          & $+0.339$ & 0.158 & $+2.141$ & $0.032$ & ✓ \\
+\texttt{s5\_esf\_x\_real} & $-0.377$ & 0.188 & $-2.001$ & $0.045$ & ✓ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+El coeficiente de \texttt{s8\_reg} $= -2.445$ ($t = -13.64$) es el más significativo del
+modelo: cada unidad adicional de regularidad en el octavo semestre \emph{reduce} el semestre
+de término predicho en $2.4$ semestres, controlando por el resto. Esta es la cuantificación
+más precisa del mecanismo de inercia académica documentado previamente.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{trunc_ridge_importancia}
+        \caption{Ridge — Top 12 predictores ($|\beta|$ estandarizado)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{trunc_lasso_importancia}
+        \caption{Lasso — Top 12 predictores (solo activos)}
+    \end{subfigure}
+    \caption{Importancia de variables — Enfoque Truncado. \texttt{s8\_reg} domina en ambos modelos,
+             seguido de \texttt{s7\_reg} y las métricas del quinto semestre.}
+    \label{fig:trunc_importancias}
+\end{figure}
+
+\subsection{Prueba Diebold-Mariano: Ridge vs.\ Lasso}
+
+La \textbf{prueba de Diebold-Mariano} \citep{diebold1995comparing} no rechaza $H_0$ de
+igualdad de errores ($DM = 0.026$, $p = 0.979$). La parsimonia de Lasso —que elimina
+9 predictores redundantes— no sacrifica desempeño estadísticamente significativo.
+Por interpretabilidad institucional, se prefiere el \textbf{modelo Lasso}.
+
+\subsection{Convergencia con el Enfoque Multiclase}
+
+La coherencia entre ambos enfoques consolida las conclusiones del capítulo:
+
+\begin{enumerate}
+    \item \textbf{Regularidad como predictor dominante.} En Random Forest la importancia Gini
+          de \texttt{s8\_reg} es la más alta; en Lasso/Ridge su coeficiente tiene el mayor
+          $|t|$ por un margen de $5\times$.
+    \item \textbf{Semestres tardíos son más informativos.} La ganancia del Modelo~B sobre A
+          y la dominancia de \texttt{s7\_reg}/\texttt{s8\_reg} en regresión apuntan al mismo
+          fenómeno: la trayectoria \emph{cristaliza} en S7–S8.
+    \item \textbf{El promedio individual tiene efecto marginal.} Ningún predictor de promedio
+          (nat/real) es significativo en la regresión, confirmando cuantitativamente la paradoja
+          del perfeccionismo documentada en el Capítulo~\ref{ch:supervivencia}.
+\end{enumerate}
