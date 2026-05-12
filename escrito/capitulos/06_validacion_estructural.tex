@@ -1,0 +1,74 @@
+\chapter{Cartografía Estructural y Validación de Grupos}
+
+Antes de analizar el ciclo de vida de los estudiantes, es imperativo demostrar formalmente que las tipologías hipotéticas de comportamiento académico son entes matemáticamente reales, estables y geométricamente separables en el espacio muestral. En este capítulo se valida la taxonomía teórica cruzando la demografía empírica con algoritmos no supervisados de aprendizaje automático.
+
+\section{Definición de Cuadrantes y Arquitectura Conceptual}
+
+La dinámica de la Facultad de Ciencias permite conceptualizar a la población estudiantil cruzando dos ejes ortogonales: la eficiencia administrativa (\textit{Regularidad}) y el desempeño en la evaluación (\textit{Promedio Natural}). 
+
+Al segmentar a la población activa en el cuarto semestre utilizando como umbral las medianas poblacionales, emergen los cuatro perfiles teóricos que guían este estudio:
+
+\begin{enumerate}
+    \item \textbf{Sin atraso:} Alta regularidad continua y alto promedio. Representa la trayectoria académica ideal.
+    \item \textbf{Pragmático:} Alta regularidad pero promedio bajo. Estudiantes eficientes que priorizan el avance continuo sobre la perfección de la nota.
+    \item \textbf{Perfeccionista:} Alto promedio pero baja regularidad. Estudiantes que sacrifican el ritmo de créditos para preservar la excelencia en su historial.
+    \item \textbf{Rezago:} Baja regularidad y bajo promedio. Trayectorias con compromiso simultáneo en ambas dimensiones.
+\end{enumerate}
+
+Es fundamental cuantificar la prevalencia de estos perfiles en el universo total analizado ($N = 8{,}288$). Como se presenta en la Figura~\ref{fig:conteo_perfiles}, la mayoría de la población habita en los extremos correlacionados: los grupos \emph{Sin atraso} y \emph{Rezago} dominan masivamente la composición, mientras que los grupos cruzados constituyen una minoría que apenas roza el $12\,\%$ en cada caso.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{conteo_perfiles_por_carrera.png}
+    \caption{Distribución poblacional de los perfiles teóricos al cuarto semestre. Se aprecia la polarización masiva hacia los grupos dominantes simétricos.}
+    \label{fig:conteo_perfiles}
+\end{figure}
+
+\section{Validación Estructural No Supervisada}
+
+Para descartar que estos cuadrantes sean una imposición estadística arbitraria, se realizó un análisis multivariante de conglomerados (\textit{clustering}) sobre el espacio vectorial.
+
+\subsection{Metodología: Blanqueamiento PCA y Árbol de Cercanías}
+
+Para evitar la dominancia de la varianza (donde la dispersión masiva del primer componente principal eclipsa a los demás), se aplicó una transformación de \emph{blanqueamiento} (\textit{whitening}). Este procedimiento re-estandariza las componentes principales a varianza unitaria ($\sigma^2 = 1$), garantizando que el eje de Regularidad y el de Promedio pesen exactamente igual en la construcción de las distancias euclidianas.
+
+Sobre este plano ecualizado se aplica el algoritmo de \textbf{Agrupamiento Jerárquico} empleando el criterio de Ward, que busca minimizar la varianza interna y revelar el orden filogenético natural de las trayectorias.
+
+\subsection{Huella Topológica de la Población Total}
+
+La Figura~\ref{fig:topologia_completa} presenta la "huella dactilar" arquitectónica de ambas licenciaturas al $100\,\%$ de los registros ($N = 8{,}288$). Para facilitar la lectura científica, se empleó un algoritmo recursivo de dominancia que pinta cada rama del árbol con el color del grupo teórico que predomina en esa sub-fusión.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{dendrograma_por_carrera.png}
+    \caption{Topología Completa de Trayectorias Académicas por Licenciatura ($N=8{,}288$). Las macroestructuras confirman la cohesión interna de las poblaciones mayoritarias.}
+    \label{fig:topologia_completa}
+\end{figure}
+
+\section{Pruebas de Estabilidad e Independencia}
+
+Dado que las poblaciones son asimétricas (el grupo Sin Atraso tiene el triple de datos que el Perfeccionista), el algoritmo anterior podría verse forzado volumétricamente. Para aislar este efecto, se ejecutó una prueba de robustez homogeneizando las muestras al límite máximo compartido.
+
+\subsection{Estabilidad Territorial en el Plano Factorial}
+
+La Figura~\ref{fig:pca_balanceado} muestra la cartografía espacial donde cada grupo cuenta con exactamente el mismo número de puntos en la gráfica. Al remover el sesgo de densidad, se revela con nitidez geométrica que los cuatro territorios poseen una soberanía espacial propia y límites sumamente nítidos.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{pca_balanceado_por_carrera.png}
+    \caption{Geometría del Espacio de Trayectorias bajo condiciones de balanceo poblacional perfecto. Se evidencia la partición geométrica intrínseca del plano.}
+    \label{fig:pca_balanceado}
+\end{figure}
+
+\subsection{El Experimento Ciego: Convergencia Algorítmica}
+
+Finalmente, se ejecutó el \emph{Experimento de Validación Ciega}: se suministraron los datos balanceados a un algoritmo de K-Means sin conocimiento alguno sobre los grupos predefinidos, solicitando que segmentara el espacio puramente por cercanía geométrica.
+
+Como ilustra la Figura~\ref{fig:blind_comparison}, los conglomerados descubiertos de forma autónoma por la máquina (espejo derecho) reproducen con una consistencia del $90\,\%$ los dominios geográficos teorizados (espejo izquierdo). Esta convergencia empírica cierra el círculo probatorio: los perfiles académicos no son artefactos humanos, sino que constituyen la estructura física subyacente de la vida académica en la facultad.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{prueba_validacion_ciega_balanceada.png}
+    \caption{Comparativa Espejo: (Izquierda) Perfiles Teóricos de control vs. (Derecha) Conglomerados descubiertos a ciegas por K-Means. La coincidencia espacial valida empíricamente el modelo.}
+    \label{fig:blind_comparison}
+\end{figure}

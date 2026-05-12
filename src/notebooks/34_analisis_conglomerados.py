@@ -116,50 +116,309 @@ def main():
         "Rezago": "#e74c3c"          # Rojo
     }
 
-    # ── NUEVO: Generación del Dendrograma (Árbol de Cercanías) ───────────────────
-    print("🌳 Generando Dendrograma con Puntos de Grupo Real...")
+    # ── NUEVO: Generación del Dendrograma Avanzado con Codificación Teórica ───────
+    print("🌳 Generando Dendrograma Codificado por Grupo Teórico (Pintado Recursivo)...")
+    from collections import Counter
+    
     plt.figure(figsize=(14, 8))
     
-    # Muestreo reproducible para consistencia visual
-    sample_size = 150
-    df_sample = df.sample(n=sample_size, random_state=42)
-    X_sample = X_for_cluster[df_sample.index.values]
+    # Muestreo reproducible y alineado con la matriz PCA ya blanqueada
+    sample_size = 180 # Aumentamos un poco el tamaño para que se aprecie bien la estructura
+    df_sample = df.sample(n=sample_size, random_state=42).copy()
     
+    # Importante: Usamos los índices originales de df para extraer el PCA correspondiente,
+    # pero luego reseteamos el index de df_sample para que el bucle coincida 1-a-1 con la matriz X_sample.
+    numeric_indices = df_sample.index.values
+    X_sample = X_for_cluster[numeric_indices]
+    df_sample = df_sample.reset_index(drop=True)
+    
+    # 1. Calcular matriz de enlace
     linkage_matrix = sch.linkage(X_sample, method='ward')
     
-    # Capturar diccionario del dendrograma para mapear las hojas
-    ax_dendro = plt.gca()
-    ddata = sch.dendrogram(linkage_matrix, truncate_mode=None, no_labels=True, color_threshold=6.0, ax=ax_dendro)
+    # 2. Preparar estructuras para el algoritmo de coloración por moda recursiva
+    # Guardamos los perfiles individuales de cada hoja (nodo original)
+    n_sample = len(df_sample)
+    node_members = [[df_sample.iloc[i]["Perfil_Teorico"]] for i in range(n_sample)]
     
-    # Dibujar línea de corte
-    plt.axhline(y=6.0, color='black', linestyle='--', alpha=0.5, label='Corte K=4')
+    # Inicializamos el diccionario de colores con los colores exactos de las hojas
+    color_lookup = [pal_teorica[df_sample.iloc[i]["Perfil_Teorico"]] for i in range(n_sample)]
     
-    # ── Mapeo Visual de Hojas a Grupos Teóricos ──
-    # ddata['leaves'] nos da el orden de izquierda a derecha de los datos en la gráfica
-    x_ticks = ax_dendro.get_xticks()
-    ordered_leaves = ddata['leaves']
+    # 3. Recorrer la matriz de enlace y determinar el color dominante de cada merge
+    for i in range(len(linkage_matrix)):
+        c1 = int(linkage_matrix[i, 0])
+        c2 = int(linkage_matrix[i, 1])
+        
+        # El nuevo nodo hereda todos los miembros de sus hijos
+        combined_members = node_members[c1] + node_members[c2]
+        node_members.append(combined_members)
+        
+        # Calculamos la moda estadística (el grupo dominante debajo de este enlace)
+        mode_group = Counter(combined_members).most_common(1)[0][0]
+        color_lookup.append(pal_teorica[mode_group])
     
-    # Para cada hoja graficada, pintamos un punto con su color TEÓRICO debajo de la base
-    for x_coord, leaf_idx in zip(x_ticks, ordered_leaves):
-        group_name = df_sample.iloc[leaf_idx]["Perfil_Teorico"]
-        leaf_color = pal_teorica[group_name]
-        plt.scatter(x_coord, -0.2, color=leaf_color, s=40, zorder=10) # Puntos bajo el eje Y=0
-
-    plt.title("Árbol de Cercanías con Etiquetas de Grupo Teóricas (Base de Hojas)\n"
-              "Observa cómo las ramas 'atrapan' visualmente el mismo color de base", fontsize=14)
-    plt.ylabel("Distancia Euclidiana de Ward")
-    plt.xlabel("Individuos (Puntos de color = Grupo Teórico Real)")
+    # 4. Graficar el dendrograma usando la función de mapeo forzado
+    # below_threshold_color y above_threshold_color no importan porque link_color_func sobreescribe todo
+    ddata = sch.dendrogram(
+        linkage_matrix, 
+        no_labels=True, 
+        link_color_func=lambda k: color_lookup[k]
+    )
     
-    # Leyenda de los puntos
+    plt.title("Mapa Estructural de Trayectorias Académicas\n"
+              "(Ramas coloreadas según el Grupo Teórico Dominante en la fusión)", fontsize=14, pad=15)
+    plt.ylabel("Distancia Euclidiana de Ward (PCA Blanqueado)")
+    plt.xlabel("Individuos Agrupados Jerárquicamente")
+    
+    # Leyenda oficial
     from matplotlib.lines import Line2D
-    custom_lines = [Line2D([0], [0], marker='o', color='w', markerfacecolor=v, markersize=10, label=k) 
-                    for k, v in pal_teorica.items()]
-    plt.legend(handles=custom_lines, title="Color Real del Estudiante", loc='upper right')
+    custom_legend = [Line2D([0], [0], color=v, lw=3, label=k) 
+                     for k, v in pal_teorica.items()]
+    plt.legend(handles=custom_legend, title="Grupo Teórico Dominante", loc='upper right')
     
     plt.tight_layout()
-    plt.savefig(IMG_DIR / "dendrograma_agrupamiento.png", dpi=300)
+    plt.savefig(IMG_DIR / "dendrograma_agrupamiento.png", dpi=300, bbox_inches="tight")
     plt.close()
-    print("✅ Dendrograma con codificación de color base guardado.")
+    print("✅ Dendrograma codificado recursivamente guardado exitosamente.")
+
+    # ── NUEVO: Dendrograma Separado por Carrera (FULL DATOS, TODA LA POBLACIÓN) ──
+    print("🌳 Generando Dendrogramas de Población Completa por Carrera...")
+    fig_carr, axes_carr = plt.subplots(1, 2, figsize=(26, 12))
+    
+    for ax_idx, carrera in enumerate(["Matemáticas", "Física"]):
+        # Seleccionamos ABSOLUTAMENTE TODOS los registros de esa carrera
+        df_sub = df[df["Carrera"] == carrera].copy()
+        total_n = len(df_sub)
+        print(f"   -> Procesando {total_n} estudiantes para {carrera}...")
+        
+        # Alinear matrices usando el dataset completo sin muestreo
+        numeric_sub_indices = df_sub.index.values
+        X_sub = X_for_cluster[numeric_sub_indices]
+        df_sub = df_sub.reset_index(drop=True)
+        
+        # 1. Calcular matriz de enlace completa
+        Z_sub = sch.linkage(X_sub, method='ward')
+        
+        # 2. ESTRUCTURA OPTIMIZADA DE ALTA ESCALA: Usamos Contadores (Frecuencias) en vez de Listas
+        # Esto previene el consumo de memoria O(N^2) y permite procesar miles de registros al instante.
+        sub_node_counters = [Counter([df_sub.iloc[i]["Perfil_Teorico"]]) for i in range(total_n)]
+        sub_color_lookup = [pal_teorica[df_sub.iloc[i]["Perfil_Teorico"]] for i in range(total_n)]
+        
+        # 3. Agregación ultra-rápida de frecuencias dominantes
+        for i in range(len(Z_sub)):
+            c1 = int(Z_sub[i, 0])
+            c2 = int(Z_sub[i, 1])
+            
+            # Sumar contadores es extremadamente eficiente y no consume memoria redundante
+            combined_counter = sub_node_counters[c1] + sub_node_counters[c2]
+            sub_node_counters.append(combined_counter)
+            
+            # Extraer la moda del contador consolidado
+            mode_group = combined_counter.most_common(1)[0][0]
+            sub_color_lookup.append(pal_teorica[mode_group])
+            
+        # 4. Graficar en el eje con líneas un poco más gruesas para visibilidad
+        import matplotlib as mpl
+        orig_lw = mpl.rcParams['lines.linewidth']
+        mpl.rcParams['lines.linewidth'] = 0.8 # Aumentado de 0.4 a 0.8 por petición de visibilidad
+        
+        sch.dendrogram(
+            Z_sub, 
+            no_labels=True, 
+            link_color_func=lambda k: sub_color_lookup[k],
+            ax=axes_carr[ax_idx]
+        )
+        mpl.rcParams['lines.linewidth'] = orig_lw # Restaurar original
+        axes_carr[ax_idx].set_title(f"{carrera}\n(Población Total: {total_n} registros)", fontsize=16, fontweight='bold')
+        axes_carr[ax_idx].set_ylabel("Distancia Euclidiana (Ward)")
+        
+    # Título y leyendas globales
+    fig_carr.suptitle("Topología Completa de Trayectorias Académicas por Licenciatura\n"
+                      "Mapeo Exhaustivo de la Dominancia del Grupo Teórico (N Total)", fontsize=20, fontweight='bold', y=1.02)
+    
+    legend_lines = [Line2D([0], [0], color=v, lw=5, label=k) for k, v in pal_teorica.items()]
+    fig_carr.legend(handles=legend_lines, title="Grupo Teórico Dominante", loc='upper center', ncol=4, bbox_to_anchor=(0.5, 0.94), fontsize=13)
+    
+    plt.tight_layout(rect=[0, 0, 1, 0.91])
+    plt.savefig(IMG_DIR / "dendrograma_por_carrera.png", dpi=300, bbox_inches="tight")
+    plt.close()
+    print("✅ Dendrogramas Poblacionales Completos guardados exitosamente.")
+
+    # ── NUEVO: Validación de Estabilidad (Muestra Balanceada Equitativa) ──────────
+    print("\n⚖️ Iniciando Prueba de Estabilidad: Muestreo Balanceado Equitativo...")
+    
+    # 1. Determinar el tamaño máximo posible para muestras equilibradas
+    conteo_grupos = df["Perfil_Teorico"].value_counts()
+    min_n_per_group = conteo_grupos.min()
+    print(f"   -> Tamaño de balanceo fijado en {min_n_per_group} registros por grupo.")
+    
+    # 2. Construir dataset balanceado (muestreo de igual tamaño para cada uno de los 4)
+    dfs_balanceados = []
+    for grupo in pal_teorica.keys():
+        sub_df = df[df["Perfil_Teorico"] == grupo].sample(n=min_n_per_group, random_state=42)
+        dfs_balanceados.append(sub_df)
+        
+    df_bal = pd.concat(dfs_balanceados).sample(frac=1, random_state=42).reset_index(drop=True)
+    n_bal = len(df_bal)
+    print(f"   -> Dataset balanceado construido con {n_bal} registros totales.")
+    
+    # 3. Extraer componentes blanqueadas
+    indices_bal = df_bal.index.values # Al usar df_bal reconstruido, debemos tomar el subset original de nuevo?
+    # ¡Corrección! Para alinear con X_for_cluster, necesitamos los índices originales que el dataframe traía.
+    # Haremos el reset_index al final.
+    df_bal_raw = pd.concat(dfs_balanceados).sample(frac=1, random_state=42)
+    orig_bal_indices = df_bal_raw.index.values
+    X_bal = X_for_cluster[orig_bal_indices]
+    df_bal_final = df_bal_raw.reset_index(drop=True)
+    
+    # 4. Calcular Linkage y Coloración
+    Z_bal = sch.linkage(X_bal, method='ward')
+    bal_node_counters = [Counter([df_bal_final.iloc[i]["Perfil_Teorico"]]) for i in range(n_bal)]
+    bal_color_lookup = [pal_teorica[df_bal_final.iloc[i]["Perfil_Teorico"]] for i in range(n_bal)]
+    
+    for i in range(len(Z_bal)):
+        c1, c2 = int(Z_bal[i, 0]), int(Z_bal[i, 1])
+        combined = bal_node_counters[c1] + bal_node_counters[c2]
+        bal_node_counters.append(combined)
+        bal_color_lookup.append(pal_teorica[combined.most_common(1)[0][0]])
+        
+    # 5. Graficar Dendrograma Balanceado
+    plt.figure(figsize=(16, 9))
+    import matplotlib as mpl
+    orig_lw = mpl.rcParams['lines.linewidth']
+    mpl.rcParams['lines.linewidth'] = 0.8 # Líneas visibles
+    
+    sch.dendrogram(
+        Z_bal,
+        no_labels=True,
+        link_color_func=lambda k: bal_color_lookup[k]
+    )
+    mpl.rcParams['lines.linewidth'] = orig_lw
+    
+    plt.title("Prueba de Estabilidad Arquitectónica: Árbol Equilibrado (Muestra Balanceada)\n"
+              f"Población homogeneizada a N={min_n_per_group} estudiantes por grupo teórico (Total N={n_bal})", 
+              fontsize=15, fontweight='bold', pad=15)
+    plt.ylabel("Distancia Euclidiana (Ward)")
+    plt.xlabel("Trayectorias Normalizadas por Volumen de Grupo")
+    
+    custom_leg = [Line2D([0], [0], color=v, lw=4, label=f"{k} (n={min_n_per_group})") for k, v in pal_teorica.items()]
+    plt.legend(handles=custom_leg, title="Grupos Equilibrados", loc='upper right', fontsize=11)
+    
+    plt.tight_layout()
+    plt.savefig(IMG_DIR / "dendrograma_balanceado_total.png", dpi=300, bbox_inches="tight")
+    plt.close()
+    print("✅ Dendrograma Balanceado de Validación guardado exitosamente.")
+
+    # ── NUEVO: Validación de Estabilidad Balanceada POR CARRERA ──────────────────
+    print("\n⚖️ Iniciando Prueba de Estabilidad Balanceada SEGMENTADA POR CARRERA...")
+    fig_b, axes_b = plt.subplots(1, 2, figsize=(26, 12))
+    
+    for ax_idx, carrera in enumerate(["Matemáticas", "Física"]):
+        df_c = df[df["Carrera"] == carrera].copy()
+        
+        # Obtener el límite de muestreo de ESTA carrera en particular
+        local_counts = df_c["Perfil_Teorico"].value_counts()
+        c_min = local_counts.min()
+        print(f"   -> {carrera}: Muestreando balanceo a {c_min} estudiantes por grupo...")
+        
+        # Construir subset balanceado de la carrera
+        dfs_c_bal = []
+        for gp in pal_teorica.keys():
+            subset_g = df_c[df_c["Perfil_Teorico"] == gp].sample(n=c_min, random_state=42)
+            dfs_c_bal.append(subset_g)
+        
+        df_cb_raw = pd.concat(dfs_c_bal).sample(frac=1, random_state=42)
+        cb_orig_indices = df_cb_raw.index.values
+        X_cb = X_for_cluster[cb_orig_indices]
+        df_cb_final = df_cb_raw.reset_index(drop=True)
+        n_cb = len(df_cb_final)
+        
+        # Linkage y Coloración
+        Z_cb = sch.linkage(X_cb, method='ward')
+        cb_node_cnt = [Counter([df_cb_final.iloc[i]["Perfil_Teorico"]]) for i in range(n_cb)]
+        cb_color_map = [pal_teorica[df_cb_final.iloc[i]["Perfil_Teorico"]] for i in range(n_cb)]
+        
+        for i in range(len(Z_cb)):
+            c1, c2 = int(Z_cb[i, 0]), int(Z_cb[i, 1])
+            comb = cb_node_cnt[c1] + cb_node_cnt[c2]
+            cb_node_cnt.append(comb)
+            cb_color_map.append(pal_teorica[comb.most_common(1)[0][0]])
+            
+        # Graficar
+        orig_lw = mpl.rcParams['lines.linewidth']
+        mpl.rcParams['lines.linewidth'] = 0.8 # Líneas bien visibles
+        sch.dendrogram(Z_cb, no_labels=True, link_color_func=lambda k: cb_color_map[k], ax=axes_b[ax_idx])
+        mpl.rcParams['lines.linewidth'] = orig_lw
+        
+        axes_b[ax_idx].set_title(f"{carrera}\n(Balanceado: {c_min} por grupo, N={n_cb})", fontsize=18, fontweight='bold')
+        axes_b[ax_idx].set_ylabel("Distancia Euclidiana (Ward)")
+        
+    fig_b.suptitle("Comparativa de Estabilidad Topológica Balanceada por Carrera\n"
+                   "Evaluación de Autonomía Estructural Eliminando el Sesgo de Población", 
+                   fontsize=22, fontweight='bold', y=1.03)
+    
+    final_legend = [Line2D([0], [0], color=v, lw=6, label=k) for k, v in pal_teorica.items()]
+    fig_b.legend(handles=final_legend, title="Perfiles Equitativos (25% cada uno)", 
+                 loc='upper center', ncol=4, bbox_to_anchor=(0.5, 0.95), fontsize=14)
+    
+    plt.tight_layout(rect=[0, 0, 1, 0.92])
+    plt.savefig(IMG_DIR / "dendrograma_balanceado_por_carrera.png", dpi=300, bbox_inches="tight")
+    plt.close()
+    print("✅ Comparativa Balanceada por Carrera guardada exitosamente.")
+
+    # ── NUEVO: Visualización de Plano PCA Balanceado por Carrera ──────────────────
+    print("\n🗺️ Generando Mapa PCA de Densidad Balanceada por Carrera...")
+    fig_pca_bal, axes_pca = plt.subplots(1, 2, figsize=(20, 8), sharey=True, sharex=True)
+    
+    for ax_idx, carrera in enumerate(["Matemáticas", "Física"]):
+        df_c = df[df["Carrera"] == carrera].copy()
+        local_counts = df_c["Perfil_Teorico"].value_counts()
+        c_min = local_counts.min()
+        
+        # Samplear balanceado para la gráfica
+        dfs_pca_bal = []
+        for gp in pal_teorica.keys():
+            subset_g = df_c[df_c["Perfil_Teorico"] == gp].sample(n=c_min, random_state=42)
+            dfs_pca_bal.append(subset_g)
+        
+        # Mezclar para que los colores en la gráfica se interpolen bien visualmente
+        df_c_balanced = pd.concat(dfs_pca_bal).sample(frac=1, random_state=42)
+        n_total_plot = len(df_c_balanced)
+        
+        # Dibujar los puntos con transparencias
+        sns.scatterplot(
+            data=df_c_balanced, 
+            x="PC1", y="PC2", 
+            hue="Perfil_Teorico", 
+            palette=pal_teorica, 
+            alpha=0.6, s=35, 
+            ax=axes_pca[ax_idx], 
+            edgecolor=None
+        )
+        
+        axes_pca[ax_idx].set_title(f"{carrera}\n(N={c_min} puntos por grupo, Total N={n_total_plot})", 
+                                   fontsize=16, fontweight='bold')
+        axes_pca[ax_idx].set_xlabel("PC1 (Regularidad Académica)")
+        axes_pca[ax_idx].set_ylabel("PC2 (Promedio Natural)")
+        
+        # Añadir líneas de cuadrantes de referencia
+        axes_pca[ax_idx].axhline(0, color='black', linewidth=1, linestyle='--', alpha=0.3)
+        axes_pca[ax_idx].axvline(0, color='black', linewidth=1, linestyle='--', alpha=0.3)
+        
+        # Limpiar leyenda interna para unificarla
+        axes_pca[ax_idx].get_legend().remove()
+        
+    fig_pca_bal.suptitle("Geometría del Espacio de Trayectorias (Muestras Equitativas)\n"
+                         "Disposición Territorial del Talento sin Sesgo de Volumen Poblacional", 
+                         fontsize=19, fontweight='bold', y=1.02)
+    
+    # Leyenda Unificada
+    fig_pca_bal.legend(handles=final_legend, title="Grupos Teóricos", 
+                       loc='upper center', ncol=4, bbox_to_anchor=(0.5, 0.93), fontsize=12)
+    
+    plt.tight_layout(rect=[0, 0, 1, 0.91])
+    plt.savefig(IMG_DIR / "pca_balanceado_por_carrera.png", dpi=300, bbox_inches="tight")
+    plt.close()
+    print("✅ Gráfica de PCA Balanceado guardada exitosamente.")
 
     # ── 3. VISUALIZACIÓN COMPARATIVA ──────────────────────────────────────────────
     
@@ -221,6 +480,44 @@ def main():
     
     plt.savefig(IMG_DIR / "tabla_contingencia_clustering.png", dpi=300, bbox_inches="tight")
     print(f"✅ Nueva Gráfica Dual guardada en: {IMG_DIR / 'tabla_contingencia_clustering.png'}")
+    
+    # ── NUEVO: Distribución de Frecuencias por Perfil y Carrera ───────────────────
+    print("\n📊 Generando Histograma de Distribución de Frecuencias...")
+    plt.figure(figsize=(12, 7))
+    
+    # Convertir el perfil a categórico para asegurar un orden visual coherente
+    orden_perfil = ["Sin atraso", "Rezago", "Pragmático", "Perfeccionista"]
+    df["Perfil_Teorico"] = pd.Categorical(df["Perfil_Teorico"], categories=orden_perfil, ordered=True)
+    
+    ax_bar = sns.countplot(
+        data=df, x="Carrera", hue="Perfil_Teorico", 
+        palette=pal_teorica, edgecolor="black", alpha=0.9
+    )
+    
+    # Añadir etiquetas numéricas exactas arriba de cada barra
+    for p in ax_bar.patches:
+        val = int(p.get_height())
+        if val > 0:
+            ax_bar.annotate(f'{val}', (p.get_x() + p.get_width() / 2., val),
+                           ha='center', va='center', xytext=(0, 8), 
+                           textcoords='offset points', fontsize=10, fontweight='bold')
+            
+    plt.title("Distribución Poblacional de Perfiles Académicos (S4)\n"
+              "Validación de Frecuencias Absolutas por Licenciatura", fontsize=16, pad=15, fontweight='bold')
+    plt.ylabel("Número Total de Estudiantes")
+    plt.xlabel("Licenciatura")
+    plt.ylim(0, df["Perfil_Teorico"].value_counts().max() * 0.7) # Ajustar altura para que quepan labels y no sobre aire
+    # Pero como está dividido por carrera, el máximo por barra es menor. Usamos un ajuste dinámico:
+    max_h = max([p.get_height() for p in ax_bar.patches if p.get_height() > 0])
+    plt.ylim(0, max_h * 1.15)
+    
+    plt.legend(title="Grupo Teórico", loc='upper right', fontsize=11)
+    sns.despine()
+    
+    plt.tight_layout()
+    plt.savefig(IMG_DIR / "conteo_perfiles_por_carrera.png", dpi=300)
+    plt.close()
+    print(f"✅ Gráfica de Distribución de Volumen guardada en: {IMG_DIR / 'conteo_perfiles_por_carrera.png'}")
     
     print("\n🎉 Proceso finalizado exitosamente.")
 
