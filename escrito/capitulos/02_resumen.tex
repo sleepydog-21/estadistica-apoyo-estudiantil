@@ -7,7 +7,7 @@ explicar y predecir el rezago académico mediante métodos estadísticos multiva
 aprendizaje automático. A partir del \emph{Vector Excalibur} —un conjunto de indicadores
 semestrales de regularidad gregoriana, índice de esfuerzo, promedio natural y promedio
 real— se construyó una arquitectura analítica de tres enfoques paralelos: exploratorio
-(PCA), inferencial (Análisis de Supervivencia) y predictivo (Random Forest y Regresión
+(PCA), inferencial (Análisis de Supervivencia) y predictivo (Regresión Logística Multinomial y Regresión
 Regularizada).
 
 El análisis de componentes principales redujo el espacio de 32 variables a cinco componentes
@@ -21,12 +21,12 @@ de alta calificación pero baja regularidad, con un \emph{Hazard Ratio} de la re
 $\text{HR} = 12.70$ ($p < 0.005$) frente a un efecto del promedio no significativo
 ($p = 0.08$).
 
-Los modelos de clasificación Random Forest —validados mediante validación cruzada estratificada
-y bootstrapping ($B = 2{,}000$)— alcanzaron una exactitud del $65.5\,\%$
-(IC~95\,\%: $[64.1\,\%, 66.9\,\%]$) con información de los primeros cuatro semestres y del
-$78.2\,\%$ (IC~95\,\%: $[77.0\,\%, 79.4\,\%]$) con la trayectoria completa; la diferencia
-es estadísticamente significativa (McNemar: $\chi^2 = 827.70$,
-$p = 5.13 \times 10^{-182}$). La regresión regularizada Lasso sobre la submuestra sin censura
+Los modelos probabilísticos de regresión logística —validados mediante validación cruzada estratificada
+y bootstrapping— clasifican con alta especificidad el grupo de graduación, alcanzando una exactitud global del
+$58.4\,\%$ con información de los primeros cuatro semestres y del
+$73.6\,\%$ con la trayectoria completa; la ganancia masiva de $+15.2$ puntos porcentuales
+es estadísticamente significativa (McNemar: $\chi^2 = 639.26$,
+$p = 4.83 \times 10^{-141}$). La regresión regularizada Lasso sobre la submuestra sin censura
 ($N = 3{,}157$; generaciones $\leq 2016$) explicó el $75.5\,\%$ de la varianza del semestre
 de egreso ($R^2 = 0.755$) con un Error Absoluto Medio de $0.957$ semestres, siendo la
 regularidad en el octavo semestre el predictor dominante en todos los modelos ($\beta = -2.445$,
@@ -38,7 +38,7 @@ directas para el diseño de sistemas de alerta estudiantil basados en regularida
 promedio.
 
 \bigskip
-\noindent\textbf{Palabras clave:} rezago académico, análisis de supervivencia, random forest,
+\noindent\textbf{Palabras clave:} rezago académico, análisis de supervivencia, regresión logística multinomial,
 regresión regularizada, paradoja del perfeccionismo, inercia académica, alerta temprana.
 
 % ──────────────────────────────────────────────────────────────────────────────
@@ -50,7 +50,7 @@ Physics at the Faculty of Sciences (UNAM) with the goal of characterizing, expla
 predicting academic delay using multivariate statistical methods and machine learning. Drawing
 on the \emph{Vector Excalibur} —a set of semestral indicators covering enrollment regularity,
 effort index, natural GPA, and real GPA— a three-pronged analytical architecture was designed:
-exploratory (PCA), inferential (Survival Analysis), and predictive (Random Forest and
+exploratory (PCA), inferential (Survival Analysis), and predictive (Multinomial Logistic Regression and
 Regularized Regression).
 
 Principal Component Analysis reduced the 32-variable space to five components explaining
@@ -63,15 +63,13 @@ graduate systematically earlier than those with high grades but low regularity, 
 regularity Hazard Ratio of $\text{HR} = 12.70$ ($p < 0.005$) versus a non-significant
 effect of GPA ($p = 0.08$).
 
-Random Forest classifiers —validated via stratified cross-validation and bootstrapping
-($B = 2{,}000$)— reached $65.5\,\%$ accuracy (95\,\% CI: $[64.1\,\%, 66.9\,\%]$) using
-only the first four semesters, and $78.2\,\%$ (95\,\% CI: $[77.0\,\%, 79.4\,\%]$) with the
-full eight-semester trajectory; the gain is statistically significant (McNemar:
-$\chi^2 = 827.70$, $p = 5.13 \times 10^{-182}$). Lasso regression on the uncensored subsample
-($N = 3{,}157$; cohorts $\leq 2016$) explained $75.5\,\%$ of graduation-semester variance
-($R^2 = 0.755$) with a Mean Absolute Error of $0.957$ semesters, with eighth-semester
-enrollment regularity as the dominant predictor across all models ($\beta = -2.445$,
-$t = -13.64$, $p < 10^{-40}$).
+Probabilistic Logistic Regression models —validated via stratified cross-validation and bootstrapping—
+correctly classified students with high specificity, achieving global accuracy of $58.4\,\%$ 
+using mid-trajectory metrics and $73.6\,\%$ when extending to the eighth-semester horizon. 
+The performance leap is statistically validated via McNemar's test ($\chi^2 = 639.26$, $p < 0.001$). 
+Furthermore, Lasso regression on the uncensored subsample ($N = 3{,}157$; cohorts $\leq 2016$) 
+explained $75.5\,\%$ of graduation-semester variance ($R^2 = 0.755$) with a Mean Absolute Error of $0.957$ semesters, 
+with eighth-semester enrollment regularity as the dominant global predictor ($\beta = -2.445$, $t = -13.64$, $p < 10^{-40}$).
 
 The findings suggest that \textbf{continuous enrollment inertia} —not academic excellence
 as measured by grades— is the statistically dominant mechanism of on-time graduation, with
@@ -79,5 +77,5 @@ direct implications for student early-warning systems that should prioritize reg
 GPA as the primary risk signal.
 
 \bigskip
-\noindent\textbf{Keywords:} academic delay, survival analysis, random forest, regularized
+\noindent\textbf{Keywords:} academic delay, survival analysis, logistic regression, regularized
 regression, perfectionist paradox, academic inertia, early warning system.

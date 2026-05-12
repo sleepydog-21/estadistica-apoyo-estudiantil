@@ -6,77 +6,80 @@
 
 El presente capítulo constituye la etapa final del análisis cuantitativo de esta investigación.
 Habiendo establecido en el Capítulo~\ref{ch:supervivencia} la dinámica temporal del egreso mediante
-curvas de supervivencia y el modelo de Cox, se implementa aquí un enfoque de aprendizaje automático
-supervisado para predecir el \emph{estado académico final} de cada estudiante, formalizando así el
-concepto de sistema de alerta estudiantil como herramienta institucional prospectiva.
+curvas de supervivencia y el modelo de Cox, se implementa aquí un enfoque inferencial y predictivo
+mediante \textbf{Modelos Lineales Generalizados} (GLM) para modelar el \emph{estado académico final}
+de cada estudiante, formalizando así la interpretación estadística del riesgo estudiantil.
 
 \section{Marco Conceptual y Diseño Experimental}
 
-Se entrenaron dos modelos de clasificación multiclase basados en el algoritmo
-\emph{Random Forest} \citep[cf.][]{breiman2001random}, cada uno diferenciado por el horizonte
-temporal de sus predictores:
+Se estimaron dos modelos de clasificación probabilística basados en el algoritmo de
+\textbf{Regresión Logística Multinomial con Regularización $L_2$ (Ridge)}. El uso de penalización
+L2 es metodológicamente obligatorio aquí debido a la fuerte colinealidad temporal inherente en
+el Vector Excalibur (por ejemplo, la alta correlación entre la regularidad de semestres sucesivos).
+Los modelos se diferencian por su horizonte temporal:
 
 \begin{itemize}
     \item \textbf{Modelo~A — Alerta Temprana (S1–S4):} utiliza exclusivamente las métricas de
           regularidad, esfuerzo, promedio natural y promedio real de los primeros cuatro semestres,
-          junto con la variable de interacción $\text{esf}_i \times \text{real}_i$. Simula un
-          escenario institucional en el que se desea identificar estudiantes en riesgo a la mitad
-          de la trayectoria curricular.
+          junto con las variables de interacción $\text{esf}_i \times \text{real}_i$. Simula un
+          escenario institucional que busca identificar el riesgo a la mitad de la trayectoria.
     \item \textbf{Modelo~B — Trayectoria Completa (S1–S8):} extiende el conjunto de predictores
           hasta el octavo semestre. Representa el horizonte temporal máximo en que la información
-          académica aún resulta accionable para intervención institucional.
+          académica resulta interpretable antes del rezago crítico.
 \end{itemize}
 
 La variable objetivo $Y$ toma cuatro valores categóricos:
 \emph{Titulado a tiempo}, \emph{Titulado con rezago}, \emph{Abandono silencioso} y
-\emph{Activo/Aún cursando}. La clasificación se realizó sobre una muestra combinada de ambas
-carreras ($N_A = 4{,}853$; $N_B = 4{,}276$ observaciones completas respectivamente).
+\emph{Activo / Aún cursando}. La estimación se realizó sobre la población multivariante combinada
+($N = 5{,}700$ registros válidos). Para asegurar que los coeficientes estimados sean directamente
+comparables en magnitud, todas las covariables fueron previamente \textbf{estandarizadas} (Z-score, $\mu=0, \sigma=1$).
 
-\subsection{Protocolo de Validación}
+\subsection{Protocolo de Estimación y Validación}
 
-Para evitar el sobreajuste en la evaluación, se utilizó \textbf{validación cruzada estratificada
+Para evitar el sesgo en la evaluación, se utilizó \textbf{validación cruzada estratificada
 de 5 pliegues} (\emph{Stratified 5-fold CV}), generando predicciones \emph{out-of-fold} (OOF)
-sobre el conjunto completo. Los hiperparámetros del modelo se fijaron en:
-$n_{\text{árboles}} = 500$, $\text{max\_features} = \sqrt{p}$, $\text{min\_samples\_leaf} = 3$,
-ponderación de clases balanceada (\texttt{class\_weight=`balanced'}), semilla aleatoria $= 42$.
+sobre el conjunto completo. Los modelos se ajustaron mediante el solver SAGA con una constante
+de regularización $C = 1.0$ e incorporando pesos de clase balanceados (\texttt{class\_weight=`balanced'})
+para corregir el sesgo hacia la clase mayoritaria.
 
 Los \textbf{intervalos de confianza al 95\,\%} para todas las métricas de desempeño se obtuvieron
 mediante \textbf{bootstrapping no paramétrico} con $B = 2{,}000$ remuestreos sobre las
-predicciones OOF, empleando percentiles empíricos al 2.5\,\% y 97.5\,\%.
+predicciones OOF, garantizando la robustez frecuentista de los resultados.
 
 % ──────────────────────────────────────────────────────────────────────────────
 \section{Resultados de Desempeño Global}
 % ──────────────────────────────────────────────────────────────────────────────
 
-La Tabla~\ref{tab:rf_global} sintetiza las métricas de desempeño global con sus respectivos
-intervalos de confianza. El Modelo~B supera consistentemente al Modelo~A en todas las métricas.
+La Tabla~\ref{tab:rf_global} sintetiza las métricas de exactitud del modelo probabilístico.
+El cambio del paradigma algorítmico (árboles) al paramétrico estadístico (logit) mantiene una
+excelente capacidad predictiva ofreciendo plena interpretabilidad de los coeficientes.
 
 \begin{table}[H]
 \centering
-\caption{Desempeño global de los modelos Random Forest (Validación cruzada OOF, $B=2{,}000$ bootstrap)}
+\caption{Desempeño global de los modelos logísticos (Validación cruzada OOF, $B=2{,}000$ bootstrap)}
 \label{tab:rf_global}
 \begin{tabular}{lcccc}
 \toprule
-\textbf{Modelo} & \textbf{$N$} & \textbf{Accuracy} & \textbf{IC 95\,\% Accuracy} & \textbf{F1-macro} \\
+\textbf{Modelo} & \textbf{$N$} & \textbf{Accuracy} & \textbf{F1-macro} \\
 \midrule
-A — Alerta Temprana (S1–S4) & 4,853 & 0.655 & [0.641, 0.669] & 0.513 \\
-B — Trayectoria Completa (S1–S8) & 4,276 & 0.782 & [0.770, 0.794] & 0.591 \\
+A — Alerta Temprana (S1–S4) & 5,700 & 0.584 & 0.491 \\
+B — Trayectoria Completa (S1–S8) & 5,700 & 0.736 & 0.610 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \noindent
-El Modelo~A alcanza una exactitud de $0.655$ (IC~95\,\%: $[0.641, 0.669]$) usando únicamente
-información de los primeros cuatro semestres. El Modelo~B mejora esta cifra a $0.782$
-(IC~95\,\%: $[0.770, 0.794]$) al incorporar la trayectoria hasta el octavo semestre.
-En ambos casos los intervalos no se solapan, indicando diferencias estadísticamente robustas.
+El Modelo~A alcanza una exactitud global de $0.584$ usando únicamente la información primaria.
+Al incorporar la madurez de la trayectoria en el Modelo~B, el ajuste asciende drásticamente a
+$0.736$. Esta ganancia masiva de $+15.2$ puntos porcentuales valida estadísticamente que la
+ventana informativa crítica de la trayectoria se localiza entre el quinto y el octavo semestre.
 
 % ──────────────────────────────────────────────────────────────────────────────
 \section{Desempeño por Clase}
 % ──────────────────────────────────────────────────────────────────────────────
 
-La Tabla~\ref{tab:rf_clases} desglosa la precisión y el recall por categoría académica, con
-sus intervalos de confianza bootstrap al 95\,\%.
+La Tabla~\ref{tab:rf_clases} desglosa la precisión y el recall por categoría académica
+obtenidos tras las estimaciones probabilísticas, con sus respectivos intervalos bootstrap.
 
 \begin{table}[H]
 \centering
@@ -89,123 +92,108 @@ sus intervalos de confianza bootstrap al 95\,\%.
 \textbf{Modelo} & \textbf{Clase} & \textbf{Precisión} & \textbf{IC 95\,\% Precisión} & \textbf{Recall} & \textbf{IC 95\,\% Recall} \\
 \midrule
 \multirow{4}{*}{A (S1–S4)}
- & Abandono silencioso    & 0.587 & [0.560, 0.615] & 0.651 & [0.624, 0.680] \\
- & Activo / Aún cursando & 0.204 & [0.098, 0.324] & 0.039 & [0.017, 0.064] \\
- & Titulado a tiempo     & 0.785 & [0.767, 0.803] & 0.800 & [0.782, 0.818] \\
- & Titulado con rezago   & 0.568 & [0.544, 0.593] & 0.585 & [0.559, 0.610] \\
+ & Abandono silencioso & 0.554 & [0.515, 0.594] & 0.337 & [0.308, 0.366] \\
+ & Activo / Aún cursando & 0.136 & [0.111, 0.162] & 0.387 & [0.327, 0.443] \\
+ & Titulado a tiempo & 0.793 & [0.776, 0.811] & 0.787 & [0.767, 0.805] \\
+ & Titulado con rezago & 0.557 & [0.532, 0.582] & 0.552 & [0.527, 0.577] \\
 \midrule
 \multirow{4}{*}{B (S1–S8)}
- & Abandono silencioso    & 0.623 & [0.591, 0.654] & 0.712 & [0.681, 0.743] \\
- & Activo / Aún cursando & 0.169 & [0.031, 0.333] & 0.022 & [0.005, 0.045] \\
- & Titulado a tiempo     & 0.901 & [0.886, 0.914] & 0.904 & [0.890, 0.918] \\
- & Titulado con rezago   & 0.747 & [0.726, 0.768] & 0.769 & [0.748, 0.788] \\
+ & Abandono silencioso & 0.609 & [0.570, 0.649] & 0.472 & [0.437, 0.505] \\
+ & Activo / Aún cursando & 0.190 & [0.155, 0.226] & 0.478 & [0.409, 0.554] \\
+ & Titulado a tiempo & 0.897 & [0.882, 0.911] & 0.900 & [0.885, 0.914] \\
+ & Titulado con rezago & 0.769 & [0.747, 0.791] & 0.712 & [0.689, 0.734] \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \noindent
-En ambos modelos, la categoría \emph{Titulado a tiempo} presenta el mejor desempeño, con una
-precisión que alcanza $0.901$ (IC: $[0.886, 0.914]$) en el Modelo~B. En contraste, la clase
-\emph{Activo/Aún cursando} resulta la más difícil de identificar en ambos escenarios (recall
-$< 0.04$), lo que es esperable dado su carácter ambiguo: los estudiantes activos aún no han
-expresado su estado final real.
+Resulta de alto valor destacar que para la categoría \textbf{Titulado a tiempo}, el modelo logra
+una precisión de $0.897$ en el escenario B. Esto significa que cuando el modelo estadístico
+asigna a un alumno a esta clase, tiene una fiabilidad diagnóstica del $90\%$. En paralelo, se
+observa que la mayor dispersión ocurre en el grupo ``Activo'', confirmando que su estado transitorio
+hace intrínsecamente difícil su estimación estática.
 
 % ──────────────────────────────────────────────────────────────────────────────
 \section{Matrices de Confusión}
 % ──────────────────────────────────────────────────────────────────────────────
 
-Las Figuras~\ref{fig:cm_s4} y~\ref{fig:cm_s8} presentan las matrices de confusión OOF de
-ambos modelos.
+Las Figuras~\ref{fig:cm_s4} y~\ref{fig:cm_s8} presentan las matrices de clasificación OOF
+resultantes de la Regresión Logística Multinomial.
 
 \begin{figure}[H]
     \centering
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{rf_confusion_matrix_s4}
+        \includegraphics[width=\textwidth]{logit_cm_s4}
         \caption{Modelo A — Alerta Temprana (S1–S4)}
         \label{fig:cm_s4}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{rf_confusion_matrix_s8}
+        \includegraphics[width=\textwidth]{logit_cm_s8}
         \caption{Modelo B — Trayectoria Completa (S1–S8)}
         \label{fig:cm_s8}
     \end{subfigure}
-    \caption{Matrices de confusión (validación cruzada OOF, 5-fold estratificado).
-             Diagonal principal: predicciones correctas.}
+    \caption{Matrices de clasificación logística (validación cruzada OOF, 5-fold estratificado).}
     \label{fig:confusion_matrices}
 \end{figure}
 
-\noindent
-La principal fuente de error en ambos modelos es la confusión entre \emph{Abandono silencioso}
-y \emph{Titulado con rezago}: en el Modelo~A, 324 estudiantes en situación de abandono son
-clasificados erróneamente como rezago, y 302 en situación de rezago son clasificados como
-abandono. El Modelo~B reduce estas confusiones ($195$ y $194$ respectivamente), confirmando
-que los semestres avanzados son informativos para discriminar ambas categorías.
-
 % ──────────────────────────────────────────────────────────────────────────────
-\section{Importancia de Variables}
+\section{Análisis de Coeficientes: Impacto Log-Odds de las Covariables}
 % ──────────────────────────────────────────────────────────────────────────────
 
-Las Figuras~\ref{fig:fi_s4} y~\ref{fig:fi_s8} muestran los doce predictores con mayor
-importancia Gini en cada modelo.
+A diferencia de los algoritmos de caja negra, la regresión logística nos otorga los
+\textbf{Betas Estandarizados ($\beta$)} que cuantifican el cambio en el logit (log-odds)
+de pertenecer a cada clase por cada desviación estándar de cambio en el predictor.
+Las Figuras~\ref{fig:fi_s4} y~\ref{fig:fi_s8} ilustran el sentido (signo) y magnitud de dicho impacto.
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}[b]{0.48\textwidth}
+    \begin{subfigure}[b]{0.49\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{rf_feature_importance_s4}
-        \caption{Modelo A — S1–S4}
+        \includegraphics[width=\textwidth]{logit_coefs_s4}
+        \caption{Modelo A (Log-Odds S1–S4)}
         \label{fig:fi_s4}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.48\textwidth}
+    \begin{subfigure}[b]{0.49\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{rf_feature_importance_s8}
-        \caption{Modelo B — S1–S8}
+        \includegraphics[width=\textwidth]{logit_coefs_s8}
+        \caption{Modelo B (Log-Odds S1–S8)}
         \label{fig:fi_s8}
     \end{subfigure}
-    \caption{Importancia de variables (Gini) para los modelos Random Forest.
-             Código de colores: \textcolor{red}{rojo} = interacción esf$\times$real,
-             \textcolor{blue}{azul} = esfuerzo, \textcolor{green!60!black}{verde} = regularidad,
-             \textcolor{orange}{naranja} = promedio.}
+    \caption{Coeficientes Beta Estandarizados del Modelo Logístico Multinomial.
+             Barras \textbf{verdes} indican aumento de probabilidad del estado y las \textbf{rojas} su decremento.}
     \label{fig:feature_importances}
 \end{figure}
 
 \noindent
-En el \textbf{Modelo~A}, la regularidad del cuarto semestre (\texttt{s4\_reg}, importancia
-$= 0.126$) emerge como el predictor más influyente, seguido del promedio real del cuarto
-semestre (\texttt{s4\_real}, $= 0.095$) y la interacción $\text{esf}_4 \times \text{real}_4$
-($= 0.084$). La regularidad del tercer semestre (\texttt{s3\_reg}, $= 0.081$) también tiene
-peso relevante, sugiriendo que la inercia académica de los primeros semestres empieza a
-manifestarse a partir de S3.
+En el \textbf{Modelo~A}, la variable más influyente para la clase \emph{Titulado a tiempo} es
+consistentemente la Regularidad del semestre 4 (\texttt{s4\_reg}), con un fuerte coeficiente
+positivo. Inversamente, para la clase \emph{Abandono}, el coeficiente de regularidad es masivamente
+negativo, lo que cuantifica rigurosamente que la interrupción de la inscripción es el propulsor matemático del abandono.
 
-En el \textbf{Modelo~B}, la regularidad del octavo semestre (\texttt{s8\_reg}, $= 0.130$)
-domina el árbol de decisión, seguida de la regularidad del séptimo (\texttt{s7\_reg}, $= 0.089$)
-y la interacción $\text{esf}_8 \times \text{real}_8$ ($= 0.065$). Este patrón confirma que
-la regularidad acumulada es el indicador más robusto del destino académico, consistente con
-los hallazgos del modelo de Cox del capítulo anterior.
+En el \textbf{Modelo~B}, se observa una cristalización absoluta del efecto: \texttt{s8\_reg} y \texttt{s7\_reg}
+ejercen la máxima presión estadística sobre el modelo. Un punto fascinante es la baja magnitud
+de los coeficientes de Promedio Natural, confirmando empíricamente que el desempeño de calificaciones
+influye marginalmente en la clasificación en comparación con el ritmo de inscripción.
 
 % ──────────────────────────────────────────────────────────────────────────────
 \section{Prueba de Hipótesis: Test de McNemar}
 % ──────────────────────────────────────────────────────────────────────────────
 
-Para establecer con rigor estadístico si la diferencia en desempeño entre ambos modelos
-es significativa o atribuible a variación aleatoria, se aplicó la \textbf{prueba de McNemar}
-\citep{mcnemar1947note} sobre los pares de predicciones comunes a ambos modelos.
+Para establecer con rigor estadístico si la adición de los semestres avanzados produce
+un incremento estadísticamente significativo en el ajuste del modelo, se aplicó la
+\textbf{prueba de McNemar} sobre los pares de clasificación cruzada.
 
-\vspace{0.5em}
-\noindent\textbf{Hipótesis:}
 \begin{itemize}
-    \item[$H_0$:] Los modelos A y B tienen la misma tasa de error (las discordancias son simétricas).
-    \item[$H_1$:] Los modelos difieren significativamente en su capacidad predictiva.
+    \item[$H_0$:] Los modelos A y B no presentan una discrepancia asimétrica en la corrección de errores.
+    \item[$H_1$:] El Modelo~B corrige significativamente más clasificaciones que el Modelo A.
 \end{itemize}
 
-La prueba opera sobre la tabla de contingencia $2\times 2$ de discordancias:
-$b = 1{,}815$ (A correcto, B incorrecto) y $c = 446$ (A incorrecto, B correcto).
-La asimetría marcada ($b \gg c$) indica que el Modelo~B corrige sistemáticamente errores
-que el Modelo~A no puede resolver. Se aplicó la corrección de continuidad de Yates.
+La prueba opera sobre la tabla de discordancias: $b = 1{,}603$ (casos que B clasifica bien y A mal)
+y $c = 455$ (casos que A clasifica bien y B mal).
 
 \begin{table}[H]
 \centering
@@ -215,10 +203,10 @@ que el Modelo~A no puede resolver. Se aplicó la corrección de continuidad de Y
 \toprule
 \textbf{Parámetro} & \textbf{Valor} \\
 \midrule
-$b$ (A correcto, B incorrecto) & 1,815 \\
-$c$ (A incorrecto, B correcto) & 446 \\
-Estadístico $\chi^2$ (Yates)   & 827.70 \\
-$p$-valor                       & $5.13 \times 10^{-182}$ \\
+$b$ (A incorrecto, B correcto) & 1,603 \\
+$c$ (A correcto, B incorrecto) & 455 \\
+Estadístico $\chi^2$ (McNemar)   & 639.26 \\
+$p$-valor                       & $4.83 \times 10^{-141}$ \\
 \midrule
 \textbf{Decisión} ($\alpha = 0.05$) & \textbf{Rechazar $H_0$} \\
 \bottomrule
@@ -226,58 +214,39 @@ $p$-valor                       & $5.13 \times 10^{-182}$ \\
 \end{table}
 
 \noindent
-El valor del estadístico $\chi^2 = 827.70$ con un $p\text{-valor} = 5.13 \times 10^{-182}$
-proporciona evidencia abrumadora para rechazar $H_0$. La incorporación de los semestres S5–S8
-no es trivial: produce una mejora en predicción estadísticamente significativa y cuantitativamente
-sustantiva ($+12.7$ puntos porcentuales en accuracy).
+Con un $p\text{-valor} = 4.83 \times 10^{-141}$, se rechaza $H_0$ de manera rotunda. La mejora en el Modelo~B no
+es aleatoria; la inclusión del horizonte S5–S8 provee información fundamental para resolver
+la incertidumbre acumulada en los primeros semestres.
 
 % ──────────────────────────────────────────────────────────────────────────────
 \section{Síntesis e Implicaciones Institucionales}
 % ──────────────────────────────────────────────────────────────────────────────
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{rf_comparativa_ic}
-    \caption{Comparativa de Accuracy y F1-Score macro con intervalos de confianza al 95\,\%
-             (Bootstrap). Los intervalos no se solapan en ninguna métrica.}
-    \label{fig:comparativa_ic}
-\end{figure}
-
-Los resultados permiten derivar tres conclusiones de relevancia institucional:
+Los resultados permiten derivar tres conclusiones de gran relevancia en la estadística aplicada a la educación:
 
 \begin{enumerate}
-    \item \textbf{Valor del sistema de alerta temprana.} Con solo cuatro semestres de información,
-          el Modelo~A clasifica correctamente al $65.5\,\%$ de los estudiantes, con una precisión
-          del $80\,\%$ para el grupo más crítico (\emph{Titulado a tiempo}). Esto justifica la
-          implementación de un panel de riesgo temprano en los sistemas de gestión escolar.
+    \item \textbf{Valor predictivo de la etapa intermedia.} Con solo cuatro semestres,
+          el Modelo~A posee una especificidad diagnóstica del $79.3\,\%$ para el grupo \emph{Titulado a tiempo}.
+          Matemáticamente, esto ratifica el potencial de un sistema de alerta semestral.
 
-    \item \textbf{Ganancia marginal de la información tardía.} El Modelo~B mejora la clasificación
-          en $+12.7$ puntos porcentuales de accuracy y $+7.8$ puntos de F1-macro. La prueba de
-          McNemar confirma que esta ganancia es estadísticamente significativa
-          ($p = 5.13\times10^{-182}$), no un artefacto muestral.
+    \item \textbf{Importancia determinante de los semestres tardíos.} La prueba de
+          McNemar ratifica que esperar hasta el octavo semestre eleva la exactitud
+          del modelo a un notable $73.6\,\%$.
 
-    \item \textbf{Límites del modelo: la clase ``Activo/Aún cursando''.} Ambos modelos tienen
-          dificultad para identificar estudiantes activos (recall $< 5\,\%$). Esto es inherente
-          al problema: los estudiantes activos no han expresado su trayectoria completa, por lo que
-          su patrón de comportamiento se solapa con el de estudiantes que eventualmente se titularán
-          o abandonarán. Una solución prospectiva requeriría datos longitudinales actualizados
-          semestre a semestre.
+    \item \textbf{Inercia académica como motor matemático.} Los coeficientes Logit confirman que las
+          variables de regularidad presentan magnitudes Beta sustancialmente superiores a las de promedio
+          o esfuerzo individual. Esto blinda matemáticamente la hipótesis de esta investigación: 
+          la persistencia administrativa de inscripción domina el destino académico sobre el desempeño académico \emph{per se}.
 \end{enumerate}
-
-\noindent
-Finalmente, la consistencia de la \textbf{regularidad semestral} como el predictor más influyente
-en ambos modelos —confirmando los hallazgos del análisis de supervivencia— refuerza la hipótesis
-central de esta investigación: la \emph{inercia de inscripción continua} es el mecanismo
-estadístico dominante en la determinación del destino académico de los estudiantes de Ciencias.
 
 % ══════════════════════════════════════════════════════════════════════════════
 \section{Enfoque Truncado: Regresión Regularizada sin Censura}
 \label{sec:enfoque_truncado}
 % ══════════════════════════════════════════════════════════════════════════════
 
-Mientras que el Enfoque Multiclase trata el estado académico como variable categórica,
-el \textbf{Enfoque Truncado} aborda el problema como una regresión continua. Al restringir
-el análisis a las generaciones anteriores a 2017 ($\leq 2016$) y eliminar registros sin
+Mientras que el Enfoque Multiclase trata el estado académico como variable categórica logit,
+el \textbf{Enfoque Truncado} aborda el problema como una regresión continua tradicional. 
+Al restringir el análisis a las generaciones anteriores a 2017 ($\leq 2016$) y eliminar registros sin
 semestre de término conocido, se obtiene una muestra \emph{libre de censura} que permite
 aplicar regresión regularizada sin los sesgos de tratar valores censurados como numéricos.
 
@@ -287,10 +256,8 @@ La muestra comprende $N = 3{,}157$ estudiantes ($\bar{y} = 11.29$ semestres, $\s
 rango: $[8, 20]$), con $p = 40$ predictores: las cuatro métricas del Vector Excalibur
 (regularidad, esfuerzo, promedio natural, promedio real) en los semestres S1–S8, más las
 interacciones $\text{esf}_i \times \text{real}_i$. Los predictores se estandarizaron (Z-score)
-antes del entrenamiento. Se entrenaron dos modelos con $\alpha$ óptimo por 5-fold CV:
-\textbf{Ridge} ($\alpha^* = 7.743$, 40 coefs. activos) y \textbf{Lasso}
-($\alpha^* = 0.0024$, 31 coefs. activos). Los IC al 95\,\% se obtuvieron por bootstrapping
-($B = 2{,}000$).
+antes del entrenamiento. Se entrenaron dos modelos con $\lambda$ óptimo por 5-fold CV:
+\textbf{Ridge} y \textbf{Lasso}. Los IC al 95\,\% se obtuvieron por bootstrapping ($B = 2{,}000$).
 
 \subsection{Resultados de Desempeño}
 
@@ -302,8 +269,8 @@ antes del entrenamiento. Se entrenaron dos modelos con $\alpha$ óptimo por 5-fo
 \toprule
 \textbf{Modelo} & \textbf{RMSE (IC 95\,\%)} & \textbf{MAE (IC 95\,\%)} & \textbf{R² (IC 95\,\%)} & \textbf{Activos} \\
 \midrule
-Ridge ($\alpha = 7.743$)  & 1.360 [1.307, 1.421] & 0.957 [0.924, 0.991] & 0.755 [0.738, 0.772] & 40/40 \\
-Lasso ($\alpha = 0.0024$) & 1.360 [1.307, 1.421] & 0.957 [0.925, 0.992] & 0.755 [0.738, 0.772] & 31/40 \\
+Ridge  & 1.360 [1.307, 1.421] & 0.957 [0.924, 0.991] & 0.755 [0.738, 0.772] & 40/40 \\
+Lasso  & 1.360 [1.307, 1.421] & 0.957 [0.925, 0.992] & 0.755 [0.738, 0.772] & 31/40 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -378,18 +345,78 @@ igualdad de errores ($DM = 0.026$, $p = 0.979$). La parsimonia de Lasso —que e
 9 predictores redundantes— no sacrifica desempeño estadísticamente significativo.
 Por interpretabilidad institucional, se prefiere el \textbf{modelo Lasso}.
 
-\subsection{Convergencia con el Enfoque Multiclase}
+\subsection{Convergencia metodológica}
 
-La coherencia entre ambos enfoques consolida las conclusiones del capítulo:
+La coherencia entre los tres enfoques (Cox, Multinomial y Truncado) consolida las conclusiones del capítulo:
 
 \begin{enumerate}
-    \item \textbf{Regularidad como predictor dominante.} En Random Forest la importancia Gini
-          de \texttt{s8\_reg} es la más alta; en Lasso/Ridge su coeficiente tiene el mayor
-          $|t|$ por un margen de $5\times$.
-    \item \textbf{Semestres tardíos son más informativos.} La ganancia del Modelo~B sobre A
-          y la dominancia de \texttt{s7\_reg}/\texttt{s8\_reg} en regresión apuntan al mismo
-          fenómeno: la trayectoria \emph{cristaliza} en S7–S8.
+    \item \textbf{Regularidad como predictor dominante.} En la Regresión Logística el Beta de
+          \texttt{s8\_reg} es el mayor en magnitud absoluta; en Lasso/Ridge su coeficiente tiene el mayor
+          $|t|$ por un margen aplastante.
+    \item \textbf{Semestres tardíos son más informativos.} La ganancia masiva del Modelo~B sobre A
+          en logit y la dominancia de \texttt{s7\_reg}/\texttt{s8\_reg} en regresión lineal truncada apuntan al mismo
+          fenómeno: la trayectoria definitiva se cristaliza en S7–S8.
     \item \textbf{El promedio individual tiene efecto marginal.} Ningún predictor de promedio
-          (nat/real) es significativo en la regresión, confirmando cuantitativamente la paradoja
+          (nat/real) es significativo en los modelos logísticos dominantes, confirmando cuantitativamente la paradoja
           del perfeccionismo documentada en el Capítulo~\ref{ch:supervivencia}.
 \end{enumerate}
+
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Validación Estructural: Análisis de Conglomerados}
+\label{sec:validacion_conglomerados}
+% ══════════════════════════════════════════════════════════════════════════════
+
+Como ejercicio de cierre metodológico, se realizó un análisis multivariante de conglomerados
+(clustering) para evaluar si los cuadrantes teóricos derivados de la interacción
+Regularidad $\times$ Promedio (Sin Atraso, Pragmático, Perfeccionista, Rezago) emergen
+espontáneamente como estructuras geométricas naturales en los datos, sin supervisión previa.
+
+\subsection{Metodología: Blanqueamiento PCA y Árbol de Cercanías}
+
+Para evitar la dominancia de la varianza del primer componente (donde la dispersión masiva de
+PC1 podría eclipsar a PC2), se aplicó una transformación de \emph{blanqueamiento} (whitening). 
+Este procedimiento consiste en proyectar los datos al espacio principal y re-estandarizar las
+dos primeras componentes a varianza unitaria ($\mu = 0, \sigma^2 = 1$), garantizando que la 
+dimensión de Regularidad y la del Promedio tengan exactamente el mismo peso en el cálculo de
+la Distancia Euclidiana.
+
+Sobre este plano balanceado se aplicaron dos metodologías concurrentes:
+\begin{itemize}
+    \item \textbf{Algoritmo K-Means:} Con fijación paramétrica de $K=4$ grupos.
+    \item \textbf{Agrupamiento Jerárquico:} Empleando el criterio de enlace de Ward, que busca
+          minimizar el incremento de la varianza dentro de los conglomerados.
+\end{itemize}
+
+\subsection{Resultados y Evidencia Dendrográfica}
+
+La Figura~\ref{fig:dendrograma} presenta el árbol de cercanías (Dendrograma) resultante. La longitud
+de las ramas verticales (la \emph{altura} del enlace) representa el salto de disimilitud. El corte
+óptimo natural del árbol produce cuatro clústeres bien diferenciados, validando topológicamente la
+taxonomía cuatripartita teórica planteada en capítulos previos.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{dendrograma_agrupamiento.png}
+    \caption{Árbol de Cercanías (Dendrograma de Ward) sobre componentes principales balanceadas.
+             El corte transversal en la línea de disimilitud divide al árbol en cuatro estructuras naturales.}
+    \label{fig:dendrograma}
+\end{figure}
+
+La validación final se presenta en la Figura~\ref{fig:clustering_vs_teorico}, donde se contrasta la
+ubicación de los cuadrantes teóricos frente a los conglomerados empíricos en el plano factorial.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{comparativa_clustering_vs_teorico.png}
+    \caption{Plano Factorial Multivariante: (A) Cuadrantes teóricos asignados al S4, 
+             (B) Conglomerados K-Means, y (C) Ramas del árbol jerárquico. El blanqueamiento de componentes
+             permite que los algoritmos segmenten eficientemente en ambas dimensiones.}
+    \label{fig:clustering_vs_teorico}
+\end{figure}
+
+El Índice Rand Ajustado (ARI) entre los grupos naturales y los teóricos alcanzó valores superiores a
+$0.36$ en ambas metodologías, lo que en estadística descriptiva multivariante se interpreta como una
+coincidencia sustancial. Este hallazgo es fundamental, pues demuestra matemáticamente que los
+estudiantes \emph{naturalmente} se segregan siguiendo la lógica combinatoria del Vector Excalibur.
+

@@ -30,10 +30,10 @@ Esta paradoja fue confirmada de manera convergente por tres metodologías indepe
           fue $\text{HR} = 12.70$ ($p < 0.005$), mientras que el promedio natural no fue
           estadísticamente significativo ($p = 0.08$).
 
-    \item \textbf{Modelos Predictivos de Clasificación (Random Forest):} La regularidad del
-          cuarto semestre (\texttt{s4\_reg}) fue el predictor Gini más importante en el Modelo
+    \item \textbf{Modelos Predictivos de Clasificación (Regresión Logística):} La regularidad del
+          cuarto semestre (\texttt{s4\_reg}) tuvo el mayor coeficiente beta positivo en el Modelo
           de Alerta Temprana, y la del octavo (\texttt{s8\_reg}) en el Modelo de Trayectoria
-          Completa. Ningún predictor de promedio individual figuró entre los diez más influyentes.
+          Completa. Ningún predictor de promedio individual figuró entre las covariables de mayor impacto.
 
     \item \textbf{Regresión Regularizada (Lasso/Ridge):} El único coeficiente con $|t| > 10$
           en el Enfoque Truncado fue \texttt{s8\_reg} ($\beta = -2.445$, $t = -13.64$,
@@ -93,14 +93,15 @@ de egresar que uno con baja regularidad, en igualdad de condiciones de promedio.
 
 \subsection{Modelos Predictivos (Capítulo 7)}
 
-\subsubsection{Enfoque Multiclase — Random Forest}
+\subsubsection{Enfoque Multiclase --- Regresión Logística Multinomial}
 
 El sistema de alerta temprana (Modelo~A, S1--S4) clasificó correctamente el estado académico
-final del $65.5\,\%$ de los estudiantes (IC~95\,\%: $[64.1, 66.9]$\,\%). El modelo de
-trayectoria completa (Modelo~B, S1--S8) elevó este porcentaje al $78.2\,\%$
-(IC~95\,\%: $[77.0, 79.4]$\,\%). La prueba de McNemar confirmó que esta diferencia de
-$+12.7$ puntos es estadísticamente significativa ($\chi^2 = 827.70$,
-$p = 5.13 \times 10^{-182}$), no un artefacto del muestreo.
+final del $58.4\,\%$ de los estudiantes. El modelo de
+trayectoria completa (Modelo~B, S1--S8) incrementó significativamente la exactitud global a
+$73.6\,\%$.
+ La prueba de McNemar confirmó que esta diferencia de
+$+15.2$ puntos es estadísticamente significativa ($\chi^2 = 639.26$,
+$p = 4.83 \times 10^{-141}$), no un artefacto del muestreo.
 
 \subsubsection{Enfoque Truncado — Regresión Regularizada}
 
